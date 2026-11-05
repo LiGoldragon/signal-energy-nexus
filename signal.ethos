@@ -1,13 +1,13 @@
 Signal
-[ energy:[ Provider Reading Level Reset ResetId Pace ] ]
-[ Call.{ Caller Input.[ Read.Provider
+[ energy:[ Provider Reading Level Reset ResetId Pace ] ]    ; imports Energy Nexus vocabulary
+[ Call.{ Caller Input.[ Read.Provider                       ; carries the peer caller and ordinary inputs
                         Subscribe
                         Redeem.Provider ] } ]
-[ Read.{ Reading Pace }
+[ Read.{ Reading Pace }                                    ; ordinary Energy Nexus outputs
   Subscribed
-  Changed.{ Provider Level Reading }
+  Changed.{ Provider Level Reading }                       ; one pushed level change
   Redeemed.Reset
-  Refused.[ ProviderDown.Provider
+  Refused.[ ProviderDown.Provider                          ; typed ordinary refusals
             NoReset
             RuleRefused.String ] ]
-[ Caller.{ ProcessId.Integer UserId.Integer } ]
+[ Caller.{ ProcessId.Integer UserId.Integer } ]            ; local envelope types
