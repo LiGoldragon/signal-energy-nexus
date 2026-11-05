@@ -406,7 +406,7 @@ dependencies = [
 
 [[package]]
 name = "signal-energy-nexus"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "datom-codec 0.32.2",
  "ethos-zero 19.0.1",

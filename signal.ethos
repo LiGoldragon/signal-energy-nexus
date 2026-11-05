@@ -3,7 +3,7 @@ Signal
 [ Call.{ Caller Input.[ Read.Provider                       ; carries the peer caller and ordinary inputs
                         Subscribe
                         Redeem.Provider ] } ]
-[ Read.{ Reading Pace }                                    ; ordinary Energy Nexus outputs
+[ Read.{ Reading Vector<Pace> }                            ; ordinary Energy Nexus outputs
   Subscribed
   Changed.{ Provider Level Reading }                       ; one pushed level change
   Redeemed.Reset

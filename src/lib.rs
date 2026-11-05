@@ -15,7 +15,7 @@ wire! { pub enum Provider { Claude, Codex } }
 wire! { pub struct Percent(pub i64); }
 wire! { pub struct Instant(pub i64); }
 wire! { pub struct Minutes(pub i64); }
-wire! { pub enum Name { Session, Week } }
+wire! { pub enum Name { Session, Week, FableWeek } }
 wire! { pub struct Window { pub name: Name, pub used: Percent, pub resets: Instant, pub duration: Minutes } }
 wire! { pub struct ResetId(pub String); }
 wire! { pub enum ResetStatus { Available, Redeeming, Redeemed } }
@@ -28,11 +28,11 @@ wire! { pub struct Recipient(pub Address); }
 wire! { pub struct Reminder { pub provider: Provider, pub level: Level, pub recipient: Recipient } }
 wire! { pub enum Target { Even, SpendBy(Instant) } }
 wire! { pub enum Standing { Over, Under, On } }
-wire! { pub struct Pace { pub provider: Provider, pub target: Target, pub expected: Percent, pub used: Percent, pub standing: Standing, pub per_day: Percent } }
+wire! { pub struct Pace { pub provider: Provider, pub name: Name, pub target: Target, pub expected: Percent, pub used: Percent, pub standing: Standing, pub per_day: Percent } }
 wire! { pub struct Caller { pub process_id: i64, pub user_id: i64 } }
 wire! { pub enum Query { Read(Provider), Subscribe, Redeem(Provider) } }
 wire! { pub struct Call { pub caller: Caller, pub input: Query } }
-wire! { pub struct Read_Data { pub reading: Reading, pub pace: Pace } }
+wire! { pub struct Read_Data { pub reading: Reading, pub pace_vector: Vec<Pace> } }
 wire! { pub struct Changed_Data { pub provider: Provider, pub level: Level, pub reading: Reading } }
 wire! { pub enum Refused { ProviderDown(Provider), NoReset, RuleRefused(String) } }
 wire! { pub enum Response { Read(Read_Data), Subscribed, Changed(Changed_Data), Redeemed(Reset), Refused(Refused) } }
