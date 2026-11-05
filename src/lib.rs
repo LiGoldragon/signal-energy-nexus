@@ -29,10 +29,14 @@ wire! { pub enum Layer { Primary, Secondary } }
 wire! { pub struct Address { pub aspect: Aspect, pub topic: Topic, pub layer: Layer } }
 wire! { pub struct Recipient(pub Address); }
 wire! { pub struct Reminder { pub provider: Provider, pub level: Level, pub recipient: Recipient } }
+wire! { pub enum Target { Even, SpendBy(Instant) } }
+wire! { pub enum Standing { Over, Under, On } }
+wire! { pub struct Pace { pub provider: Provider, pub target: Target, pub expected: Percent, pub used: Percent, pub standing: Standing, pub per_day: Percent } }
 wire! { pub enum Query { Read(Provider), Subscribe, Redeem(Provider) } }
+wire! { pub struct Read_Data { pub reading: Reading, pub pace: Pace } }
 wire! { pub struct Changed_Data { pub provider: Provider, pub level: Level, pub reading: Reading } }
 wire! { pub enum Refused { ProviderDown(Provider), NoReset, RuleRefused(String) } }
-wire! { pub enum Response { Read(Reading), Subscribed, Changed(Changed_Data), Redeemed(Reset), Refused(Refused) } }
+wire! { pub enum Response { Read(Read_Data), Subscribed, Changed(Changed_Data), Redeemed(Reset), Refused(Refused) } }
 pub const ETHOS: &str = include_str!("../signal.ethos");
 impl signal::Contracted for Query {
     const CONTRACT_SOURCE: &'static str = ETHOS;
