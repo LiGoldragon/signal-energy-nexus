@@ -1,0 +1,13 @@
+Signal
+[ energy:[ Provider Reading Level Reset ResetId ] ]
+[ Read.Provider
+  Subscribe
+  Redeem.Provider ]
+[ Read.Reading
+  Subscribed
+  Changed.{ Provider Level Reading }
+  Redeemed.Reset
+  Refused.[ ProviderDown.Provider
+            NoReset
+            RuleRefused.String ] ]
+[]
