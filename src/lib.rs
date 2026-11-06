@@ -48,7 +48,10 @@ mod tests {
     #[test]
     fn validated_binary_round_trip() {
         let value = Call {
-            caller: Caller { process_id: 1, user_id: 2 },
+            caller: Caller {
+                process_id: 1,
+                user_id: 2,
+            },
             input: Query::Read(Provider::Codex),
         };
         let bytes = value.signalize().unwrap();
@@ -62,5 +65,50 @@ mod tests {
     fn ethos_declaration_checks() {
         let file = Potential::<File>::from(ETHOS).actualize().unwrap();
         file.validate().unwrap();
+    }
+
+    fn reminder() -> Reminder {
+        Reminder {
+            provider: Provider::Codex,
+            level: Level::Low,
+            recipient: Recipient(Address {
+                aspect: signal_flow::Aspect::Mind,
+                topic: "energyNexus".into(),
+                model: signal_flow::Model::Sol,
+            }),
+        }
+    }
+
+    #[test]
+    fn a_reminder_to_a_model_addressed_flow_round_trips_in_binary() {
+        let value = reminder();
+        let bytes = value.signalize().unwrap();
+        let restored = Signal::<Reminder>::from(bytes.bytes().to_vec())
+            .restore()
+            .unwrap();
+        assert_eq!(restored, value);
+    }
+
+    #[cfg(feature = "datom")]
+    #[test]
+    fn a_reminder_names_the_model_in_datom_text() {
+        use datom_codec::{Actualizing, Budget, Datomizable, Potential};
+        use protos::{Compactable, Protosizable, ReaderBudget};
+        let value = reminder();
+        let text = value.datomize(Vec::new()).protosize().compact();
+        assert!(
+            text.contains("Sol"),
+            "the recipient carries its model: {text}"
+        );
+        let mut budget = Budget {
+            remaining: 256,
+            reader: ReaderBudget::try_from(256).unwrap(),
+            depth: 0,
+            maximum_depth: 32,
+        };
+        let restored: Reminder = Potential::<Reminder>::from(text.as_str())
+            .actualize(&mut budget)
+            .unwrap();
+        assert_eq!(restored, value);
     }
 }
