@@ -63,4 +63,34 @@ mod tests {
         let file = Potential::<File>::from(ETHOS).actualize().unwrap();
         file.validate().unwrap();
     }
+    /// A reminder's recipient is a Flow Address naming its Model.
+    #[cfg(feature = "datom")]
+    #[test]
+    fn a_reminder_recipient_names_its_model() {
+        use datom_codec::{Actualizing, Budget, Datomizable};
+        use protos::{Compactable, Protosizable, ReaderBudget};
+        let reminder = Reminder {
+            provider: Provider::Codex,
+            level: Level::Low,
+            recipient: Recipient(Address {
+                aspect: signal_flow::Aspect::Mind,
+                topic: "energyNexus".into(),
+                model: signal_flow::Model::Sol,
+            }),
+        };
+        let text = reminder.datomize(vec![]).protosize().compact();
+        assert_eq!(text, "{ Codex Low { { Mind energyNexus Sol } } }");
+        let mut budget = Budget {
+            remaining: 4096,
+            reader: ReaderBudget { remaining: 4096 },
+            depth: 0,
+            maximum_depth: 1024,
+        };
+        assert_eq!(
+            datom_codec::Potential::<Reminder>::from(text.as_str())
+                .actualize(&mut budget)
+                .unwrap(),
+            reminder
+        );
+    }
 }
