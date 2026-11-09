@@ -2,7 +2,7 @@
 
 ## 0.4.0 — signal-flow 57.0.0 with Observe.TurnEnds; Read answers the latest reading
 
-Repins signal-flow 57.0.0 at `8e56457` (Observe.TurnEnds, the turn ends the Energy Nexus reads a provider on; branch idle-0533-ff3882, not yet a main). The wire types are unchanged. `Read.Provider` now answers the provider's latest reading, read from the provider first when that reading is older than the last turn end on it (or there is none); before, every `Read` read the provider. The authored `signal.ethos` says so on the `Read` line, so the contract digest changes.
+Repins signal-flow 57.0.0 at `3d0a4cd` (Observe.TurnEnds, the turn ends the Energy Nexus reads a provider on, and Observe.Metaflows; branch idle-0533-ff3882, not yet a main). The wire types are unchanged. `Read.Provider` now answers the provider's latest reading, read from the provider first when that reading is older than the last turn end on it (or there is none); before, every `Read` read the provider. The authored `signal.ethos` says so on the `Read` line, so the contract digest changes.
 
 ## 0.3.0 — signal 10.3.0, datom-codec 0.33.0, protos 0.33.0, signal-flow 57.0.0
 
