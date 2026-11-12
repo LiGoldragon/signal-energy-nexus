@@ -54,7 +54,26 @@ Library
   Uncertain.{ Failure At }                        ; post-submission uncertainty and its observation time
   RedemptionState.[ Prepared Submitted Uncertain RedemptionOutcome ] ; one durable state/result
   Redemption.{ RedemptionId Reset At RedemptionState } ; selected metadata is held once
-  RedemptionResult.[ Redemption Failure ]                  ; projected from the durable record, no repeated outcome
+  ActiveRedemption.[ Redemption Absent ]                    ; current record, or no record at the selected identity
+  RedemptionTransition.{ Redemption SaveReceipt }           ; attempted record plus local save evidence
+  RedemptionResult.[ Current.{ Redemption PersistenceReadback } ; current record, durability explicit
+                     NotCommitted.{ ActiveRedemption RedemptionTransition } ; rejected candidate and retained record
+                     Failure ]                  ; projected from the durable record, no repeated outcome
+  SaveId.String                                             ; allocated once by initiating owner, preserved by every saver
+  StoredStateId.String                                      ; fingerprint of exact validated enveloped bytes
+  BeforeReplacement.[ Validation Serialization TemporaryCreate TemporaryWrite TemporarySync Replacement ] ; definite local failure stage
+  AfterReplacement.[ ParentOpen ParentSync ]                ; observed local rename already succeeded
+  SaveOutcome.[ NotReplaced.BeforeReplacement                ; target not replaced by this attempt
+                ReplacedDurabilityUncertain.{ StoredStateId AfterReplacement } ; candidate current, crash survival unproved
+                Durable.StoredStateId ]                    ; file and containing directory synchronized
+  SaveReceipt.{ SaveId SaveOutcome }                        ; local save observation, correlated to initiating request
+  PersistenceStatus.[ Durable.StoredStateId                 ; witnessed durable save in this process
+                      Unproved.StoredStateId               ; validated current file, durability not witnessed
+                      Volatile ]                           ; in-memory defaults without an admitted file
+  LastSave.[ SaveReceipt Never ]                            ; process-local latest attempt; never fabricated on load
+  PersistenceReadback.{ PersistenceStatus LastSave }         ; current state and attempted change are different facts
+  SaveAcknowledgement.[ SaveReceipt                        ; actual local receipt arrived
+                        Unconfirmed.{ SaveId Failure } ]    ; missing remote receipt establishes no active candidate
   Caller.{ ProcessId.Integer UserId.Integer } ]            ; peer caller carried through forwarding
 []                                                        ; calculation and effect traits live with their owning operations
 []                                                        ; shared vocabulary declares no runtime owner
