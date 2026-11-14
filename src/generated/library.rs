@@ -214,13 +214,6 @@ pub enum Target {
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct ProviderTarget {
     pub provider: Provider,
-    pub target: Target,
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub struct WindowTarget {
-    pub provider: Provider,
     pub name: Name,
     pub target: Target,
 }
