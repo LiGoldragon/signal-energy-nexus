@@ -5,10 +5,11 @@ Signal
   Redeem.Provider ]
 [ Read.{ Reading Vector<Pace> }                           ; ordinary Energy Nexus outputs, the n-th answering the n-th input
   Subscribed
-  Changed.{ Provider Level Reading }                      ; one pushed level change
   Redeemed.Reset
-  Refused.[ ProviderDown.Provider                         ; typed ordinary refusals
+  Changed.{ Provider Level Reading }                      ; one pushed level change, answering no input
+  Refused ]                                               ; any input's refusal
+[ Refused.[ ProviderDown.Provider                         ; typed ordinary refusals
             NoReset
-            RuleRefused.String ] ]
-[ Caller.{ ProcessId.Integer UserId.Integer }             ; local envelope types
+            RuleRefused.String ]
+  Caller.{ ProcessId.Integer UserId.Integer }             ; local envelope types
   Call.{ Caller Input } ]                                 ; carries the peer caller and the ordinary input

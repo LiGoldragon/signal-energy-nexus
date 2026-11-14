@@ -13,14 +13,19 @@
 //! the `Topic` newtype. A change to a byte, a text or a digest fails the test
 //! naming the line.
 //!
-//! `contract.txt` is the identity of the generated contract: its Ethos text
-//! had to change (ethos-zero 28 refuses the 0.5.0 text), so its digest and
-//! the greeting that carries it moved; `binary.txt` and `datom.txt` are the
-//! 0.4.0 fixtures, unchanged. `hand_and_generated.rs` holds the 0.5.0 digest.
+//! `contract.txt` is the identity of the 0.6.0 contract: its Ethos text had
+//! to change (ethos-zero 28 refuses the 0.5.0 text, and 0.6.0 reorders the
+//! outputs and names `Refused`), so its digest and the greeting that carries
+//! it moved. `binary.txt` and `datom.txt` are the 0.4.0 fixtures with one
+//! change: in 0.6.0 `Redeemed` is the third output and `Changed` the fourth,
+//! so the `Response.Redeemed` line carries tag 02 where 0.4.0 had 03, and
+//! `Response.Changed` 03 where it had 02; nothing else moved, and the datom
+//! text, which carries names, is unchanged. `hand_and_generated.rs` holds
+//! the 0.5.0 digest and proves the tag swap is the one byte difference.
 //!
 //! The values are built from the types ethos-zero generates. The fixture
-//! lines keep the 0.4.0 names: `Query`, `Response` and `Refused` are the
-//! generated `Input`, `Output` and `Refused_Data`, and a field that held a
+//! lines keep the 0.4.0 names: `Query` and `Response` are the generated
+//! `Input` and `Output`, and a field that held a
 //! `Percent`, an `Instant`, a `Minutes`, a `bool` or an `i64` now holds the
 //! newtype the Ethos names for it (`Used`, `Resets`, `Duration`, `Expires`,
 //! `Allowed`, `At`, `Left`, `Expected`, `PerDay`, `ProcessId`, `UserId`),
@@ -276,13 +281,13 @@ fn produce(wire: &mut Wire) {
             reading: reading(Provider::Codex),
         }
     );
-    case!(wire, "Refused.ProviderDown", Refused_Data, Refused_Data::ProviderDown(Provider::Claude));
-    case!(wire, "Refused.NoReset", Refused_Data, Refused_Data::NoReset);
+    case!(wire, "Refused.ProviderDown", Refused, Refused::ProviderDown(Provider::Claude));
+    case!(wire, "Refused.NoReset", Refused, Refused::NoReset);
     case!(
         wire,
         "Refused.RuleRefused",
-        Refused_Data,
-        Refused_Data::RuleRefused("no reset is available".to_string())
+        Refused,
+        Refused::RuleRefused("no reset is available".to_string())
     );
     case!(
         wire,
@@ -305,7 +310,7 @@ fn produce(wire: &mut Wire) {
         })
     );
     case!(wire, "Response.Redeemed", Output, Output::Redeemed(reset(ResetStatus::Redeemed)));
-    case!(wire, "Response.Refused", Output, Output::Refused(Refused_Data::NoReset));
+    case!(wire, "Response.Refused", Output, Output::Refused(Refused::NoReset));
 }
 
 fn contract() -> Vec<(String, String)> {

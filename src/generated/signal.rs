@@ -5,6 +5,14 @@
     clippy::type_complexity
 )]
 #[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub enum Refused {
+    ProviderDown(crate::Provider),
+    NoReset,
+    RuleRefused(String),
+}
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct ProcessId(pub i64);
@@ -52,20 +60,12 @@ pub struct Changed_Data {
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub enum Refused_Data {
-    ProviderDown(crate::Provider),
-    NoReset,
-    RuleRefused(String),
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum Output {
     Read(Read_Data),
     Subscribed,
-    Changed(Changed_Data),
     Redeemed(crate::Reset),
-    Refused(Refused_Data),
+    Changed(Changed_Data),
+    Refused(Refused),
 }
 #[rustfmt::skip]
 #[allow(clippy::result_large_err, clippy::ptr_arg, clippy::borrowed_box)]
@@ -75,7 +75,7 @@ pub trait Answering {
     fn redeem(
         &self,
         provider: &crate::Provider,
-    ) -> std::result::Result<Changed_Data, Output>;
+    ) -> std::result::Result<crate::Reset, Output>;
 }
 #[rustfmt::skip]
 pub trait Answerable {
@@ -92,7 +92,7 @@ impl Answerable for Input {
                 nexus.subscribe().map_or_else(|refusal| refusal, |()| Output::Subscribed)
             }
             Input::Redeem(carried) => {
-                nexus.redeem(carried).map_or_else(|refusal| refusal, Output::Changed)
+                nexus.redeem(carried).map_or_else(|refusal| refusal, Output::Redeemed)
             }
         }
     }

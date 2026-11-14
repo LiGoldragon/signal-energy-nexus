@@ -38,6 +38,43 @@ mod tests {
         assert_eq!(restored, value);
     }
 
+    /// Answers every input, so the generated dispatch can be read.
+    struct Answers;
+    impl Answering for Answers {
+        fn read(&self, _provider: &Provider) -> Result<Read_Data, Output> {
+            Err(Output::Refused(Refused::NoReset))
+        }
+        fn subscribe(&self) -> Result<(), Output> {
+            Ok(())
+        }
+        fn redeem(&self, provider: &Provider) -> Result<Reset, Output> {
+            Ok(Reset {
+                reset_id: ResetId(format!("{provider:?}")),
+                reset_status: ResetStatus::Redeemed,
+                expires: Expires(Instant(0)),
+            })
+        }
+    }
+
+    /// The third output answers the third input: a redeem is answered
+    /// `Redeemed`, and a refusal stands for any input's answer.
+    #[test]
+    fn redeem_is_answered_redeemed() {
+        assert_eq!(
+            Input::Redeem(Provider::Codex).answer(&Answers),
+            Output::Redeemed(Reset {
+                reset_id: ResetId("Codex".into()),
+                reset_status: ResetStatus::Redeemed,
+                expires: Expires(Instant(0)),
+            })
+        );
+        assert_eq!(Input::Subscribe.answer(&Answers), Output::Subscribed);
+        assert_eq!(
+            Input::Read(Provider::Claude).answer(&Answers),
+            Output::Refused(Refused::NoReset)
+        );
+    }
+
     fn reminder() -> Reminder {
         Reminder {
             provider: Provider::Codex,
