@@ -35,18 +35,33 @@ Target.SpendBy SpendBy.1789200000
 Standing.Over Over
 Standing.Under Under
 Standing.On On
-Pace { Claude Week Even 50 61 Over 9 }
+Hours 124
+Decimal 83.5
+Decimal.Whole 32.0
+Hour 8
+Weekday.Monday Monday
+Weekday.Tuesday Tuesday
+Weekday.Wednesday Wednesday
+Weekday.Thursday Thursday
+Weekday.Friday Friday
+Weekday.Saturday Saturday
+Weekday.Sunday Sunday
+Usefulness 60
+Baseline 20
+Span { [ Tuesday Thursday ] 19 23 100 }
+Override { 1794859200 1794866400 0 }
+Pace { Claude Week Even 50 61 Over 124 83.5 0.78 }
 Caller { 4242 1001 }
 Query.Read Read.Claude
 Query.Subscribe Subscribe
 Query.Redeem Redeem.Codex
 Call { { 4242 1001 } Read.Codex }
-Read_Data { { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week SpendBy.1789200000 50 61 Under 9 } { Claude Week Even 50 61 On 9 } ] }
+Read_Data { { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week SpendBy.1789200000 50 61 Under 124 83.5 0.78 } { Claude Week Even 50 61 On 124 83.5 0.78 } ] }
 Changed_Data { Codex Out { Codex True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } }
 Refused.ProviderDown ProviderDown.Claude
 Refused.NoReset NoReset
 Refused.RuleRefused RuleRefused.«no reset is available»
-Response.Read Read.{ { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week Even 50 61 Over 9 } ] }
+Response.Read Read.{ { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week Even 50 61 Over 124 83.5 0.78 } ] }
 Response.Subscribed Subscribed
 Response.Changed Changed.{ Claude Plenty { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } }
 Response.Redeemed Redeemed.{ reset-a1 Redeemed 1789100000 }

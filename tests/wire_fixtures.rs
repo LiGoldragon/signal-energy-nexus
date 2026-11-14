@@ -1,5 +1,4 @@
-//! The wire of this contract, held against fixtures made by the 0.4.0
-//! revision (97741d2, on signal 10.3.0 and signal-flow 57 at 3d0a4cd).
+//! The wire of this contract, held against fixtures.
 //!
 //! Each fixture line is `Name value`. `binary.txt` holds the rkyv archive of
 //! one value of every wire type, in hex; `datom.txt` holds its datom text
@@ -7,11 +6,12 @@
 //! identity the crate exposes: the digest of its authored Ethos source and the
 //! greeting and receipt that carry it.
 //!
-//! The fixtures were produced by running this file at 97741d2 with
-//! `WIRE_FIXTURES_WRITE=<directory>`; the one line that differs there is
-//! `topic`, which at 97741d2 builds the alias `Topic = String` and here builds
-//! the `Topic` newtype. A change to a byte, a text or a digest fails the test
-//! naming the line.
+//! The fixtures were first produced by running this file at 97741d2 (0.4.0)
+//! with `WIRE_FIXTURES_WRITE=<directory>`. 0.6.0 wrote them again: pace is
+//! counted in useful hours, so the lines of `Pace`, `Read_Data` and
+//! `Response.Read` and the contract identity moved, the schedule's types were
+//! added, and every other line is the 0.4.0 line, byte for byte. A change to a
+//! byte, a text or a digest fails the test naming the line.
 
 use signal::{ByteViewable, Contracted, Restorable, Signal, Signalizable};
 use signal_energy_nexus::*;
@@ -85,7 +85,7 @@ macro_rules! case {
         $wire.binary.push((name.clone(), hex(bytes.bytes())));
         if let Some(held) = $wire.held_binary.get(&name) {
             let restored = Signal::<$type>::from(unhex(held)).restore().unwrap();
-            assert_eq!(restored, value, "the 0.4.0 bytes of {name} restore to the value");
+            assert_eq!(restored, value, "the held bytes of {name} restore to the value");
         }
         #[cfg(feature = "datom")]
         {
@@ -93,7 +93,7 @@ macro_rules! case {
             $wire.datom.push((name.clone(), text));
             if let Some(held) = $wire.held_datom.get(&name) {
                 let restored: $type = datom_value(held);
-                assert_eq!(restored, value, "the 0.4.0 text of {name} reads as the value");
+                assert_eq!(restored, value, "the held text of {name} reads as the value");
             }
         }
     }};
@@ -146,8 +146,18 @@ fn pace(standing: Standing, target: Target) -> Pace {
         expected: Percent(50),
         used: Percent(61),
         standing,
-        per_day: Percent(9),
+        hours_left: Hours(124),
+        useful_left: decimal(83.5),
+        per_useful_hour: decimal(0.78),
     }
+}
+
+fn decimal(value: f64) -> Decimal {
+    Decimal::try_from(value).unwrap()
+}
+
+fn usefulness(percent: i64) -> Usefulness {
+    Usefulness(Percent(percent))
 }
 
 fn caller() -> Caller {
@@ -227,6 +237,44 @@ fn produce(wire: &mut Wire) {
     for standing in [Standing::Over, Standing::Under, Standing::On] {
         case!(wire, format!("Standing.{standing:?}"), Standing, standing);
     }
+    case!(wire, "Hours", Hours, Hours(124));
+    case!(wire, "Decimal", Decimal, decimal(83.5));
+    case!(wire, "Decimal.Whole", Decimal, decimal(32.0));
+    case!(wire, "Hour", Hour, Hour(8));
+    for weekday in [
+        Weekday::Monday,
+        Weekday::Tuesday,
+        Weekday::Wednesday,
+        Weekday::Thursday,
+        Weekday::Friday,
+        Weekday::Saturday,
+        Weekday::Sunday,
+    ] {
+        case!(wire, format!("Weekday.{weekday:?}"), Weekday, weekday);
+    }
+    case!(wire, "Usefulness", Usefulness, usefulness(60));
+    case!(wire, "Baseline", Baseline, Baseline(Percent(20)));
+    case!(
+        wire,
+        "Span",
+        Span,
+        Span {
+            weekday_vector: vec![Weekday::Tuesday, Weekday::Thursday],
+            from: Hour(19),
+            to: Hour(23),
+            usefulness: usefulness(100),
+        }
+    );
+    case!(
+        wire,
+        "Override",
+        Override,
+        Override {
+            from: instant(1_794_859_200),
+            to: instant(1_794_866_400),
+            usefulness: usefulness(0),
+        }
+    );
     case!(wire, "Pace", Pace, pace(Standing::Over, Target::Even));
     case!(wire, "Caller", Caller, caller());
     case!(wire, "Query.Read", Query, Query::Read(Provider::Claude));
@@ -346,20 +394,20 @@ fn differences(name: &str, produced: &[(String, String)]) -> Vec<String> {
     for (key, value) in produced {
         match held.get(key) {
             Some(expected) if expected == value => {}
-            Some(expected) => found.push(format!("{name} {key}: 0.4.0 {expected} now {value}")),
-            None => found.push(format!("{name} {key}: not in the 0.4.0 fixture, now {value}")),
+            Some(expected) => found.push(format!("{name} {key}: held {expected} now {value}")),
+            None => found.push(format!("{name} {key}: not in the held fixture, now {value}")),
         }
     }
     for key in held.keys() {
         if !produced.iter().any(|(produced_key, _)| produced_key == key) {
-            found.push(format!("{name} {key}: in the 0.4.0 fixture, not produced now"));
+            found.push(format!("{name} {key}: in the held fixture, not produced now"));
         }
     }
     found
 }
 
 #[test]
-fn the_wire_is_the_0_4_0_wire() {
+fn the_wire_is_the_held_wire() {
     let writing = std::env::var("WIRE_FIXTURES_WRITE").ok();
     let mut wire = Wire {
         held_binary: BTreeMap::new(),
@@ -391,7 +439,7 @@ fn the_wire_is_the_0_4_0_wire() {
         .collect::<Vec<_>>();
     for (key, value) in &produced_contract {
         if held_contract.get(key) != Some(value) {
-            found.push(format!("contract.txt {key}: 0.4.0 {:?} now {value}", held_contract.get(key)));
+            found.push(format!("contract.txt {key}: held {:?} now {value}", held_contract.get(key)));
         }
     }
     assert!(found.is_empty(), "the wire moved:\n{}", found.join("\n"));
