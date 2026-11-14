@@ -25,7 +25,7 @@ Library
   Recipient.Address
   Reminder.{ Provider Level Recipient }                    ; a reminder destination and crossing
   Target.[ Even                                            ; how usage is intended to be spent: the window evenly,
-           SpendBy.{ Instant Percent } ]                   ; or this much of it by this instant
+           SpendBy.{ Hours Percent } ]                     ; or this much of it by this many hours before the window resets, each window
   ProviderTarget.{ Provider Target }                       ; one provider's pace target
   WindowTarget.{ Provider Name Target }                    ; one window's pace target override
   Pace.{ Provider Name Target Expected Used Standing.[ Over Under On ] ; actual usage against its target, time in useful hours

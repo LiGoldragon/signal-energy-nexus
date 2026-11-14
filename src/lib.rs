@@ -178,12 +178,12 @@ mod tests {
         let whole = FiniteDecimal::try_from(32.0).unwrap();
         assert_eq!(whole.datomize(Vec::new()).protosize().compact(), "32.0");
         let short = Target::SpendBy(SpendBy_Data {
-            instant: Instant(1_762_450_320),
+            hours: Hours(48),
             percent: Percent(80),
         });
         assert_eq!(
             short.datomize(Vec::new()).protosize().compact(),
-            "SpendBy.{ 1762450320 80 }"
+            "SpendBy.{ 48 80 }"
         );
     }
 

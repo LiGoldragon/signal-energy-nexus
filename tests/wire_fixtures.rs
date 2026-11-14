@@ -30,6 +30,10 @@
 //! `FiniteDecimal`) have lines of their own. Every other line is the 0.4.0
 //! line, byte for byte.
 //!
+//! 0.7.0 makes `SpendBy` carry hours before the window resets in place of
+//! an instant: the `Target.SpendBy` and `Read_Data` lines hold 48 hours, and
+//! `contract.txt` holds the identity the changed `Read` comment gives.
+//!
 //! The values are built from the types ethos-zero generates. The fixture
 //! lines keep the 0.4.0 names: `Query` and `Response` are the generated
 //! `Input` and `Output`, and a field that held a
@@ -179,7 +183,7 @@ fn pace(standing: Standing, target: Target) -> Pace {
 
 fn spend_by() -> Target {
     Target::SpendBy(SpendBy_Data {
-        instant: instant(1_789_200_000),
+        hours: Hours(48),
         percent: Percent(80),
     })
 }

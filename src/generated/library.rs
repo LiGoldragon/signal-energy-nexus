@@ -199,7 +199,7 @@ pub struct Reminder {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct SpendBy_Data {
-    pub instant: Instant,
+    pub hours: Hours,
     pub percent: Percent,
 }
 #[rustfmt::skip]
