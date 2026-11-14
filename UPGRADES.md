@@ -6,7 +6,9 @@
 
 The bytes do not change shape: `Hours` and `Instant` are both an `i64`, so a `SpendBy` archives with the same size, and only its meaning moves; a 0.6.0 `SpendBy.{ 1789200000 80 }` would read as 1789200000 hours. The contract digest therefore moves, by the one comment on the `Read` line of `ethos/signal.ethos` (the digest covers `signal.ethos` and not the library), `-8897529803879169300` to `8351560973109316117`, so a 0.6.0 peer is refused at its greeting rather than misreading a target. Both binary peers, the daemon and its translator, ship in one energy-nexus package, which moves to 0.5.0 with this contract.
 
-`tests/fixtures/` holds the new lines of `Target.SpendBy`, `Read_Data` (its pace carries a SpendBy target) and the contract identity; every other line is as 0.6.0 held it.
+A target is the Week window alone. `ProviderTarget.{ Provider Target }` applies to its provider's Week window; the Session window takes no target, because the session is a ceiling on the rate of work, and the other windows (Claude's `FableWeek`) are paced `Even`. `WindowTarget` is removed from the Library (a window's own target is gone). `Pace.Standing` gains `Spent`, appended after `On`: a Session pace entry whose window is used to 100 percent stands `Spent`, a fault in the pace of work rather than a window run past its target. A tag is added at the end of `Standing`, so earlier standings keep their bytes.
+
+`tests/fixtures/` holds the new lines of `Target.SpendBy`, `Read_Data` (its pace carries a SpendBy target), `Standing.Spent` and the contract identity; every other line is as 0.6.0 held it.
 
 ## 0.6.0 — generated from Ethos by ethos-zero 28.0.0; Redeemed answers Redeem
 

@@ -262,7 +262,7 @@ fn produce(wire: &mut Wire) {
     );
     case!(wire, "Target.Even", Target, Target::Even);
     case!(wire, "Target.SpendBy", Target, spend_by());
-    for standing in [Standing::Over, Standing::Under, Standing::On] {
+    for standing in [Standing::Over, Standing::Under, Standing::On, Standing::Spent] {
         case!(wire, format!("Standing.{standing:?}"), Standing, standing);
     }
     case!(wire, "Pace", Pace, pace(Standing::Over, Target::Even));
