@@ -12,6 +12,19 @@
 //! `topic`, which at 97741d2 builds the alias `Topic = String` and here builds
 //! the `Topic` newtype. A change to a byte, a text or a digest fails the test
 //! naming the line.
+//!
+//! `contract.txt` is the identity of the generated contract: its Ethos text
+//! had to change (ethos-zero 28 refuses the 0.5.0 text), so its digest and
+//! the greeting that carries it moved; `binary.txt` and `datom.txt` are the
+//! 0.4.0 fixtures, unchanged. `hand_and_generated.rs` holds the 0.5.0 digest.
+//!
+//! The values are built from the types ethos-zero generates. The fixture
+//! lines keep the 0.4.0 names: `Query`, `Response` and `Refused` are the
+//! generated `Input`, `Output` and `Refused_Data`, and a field that held a
+//! `Percent`, an `Instant`, a `Minutes`, a `bool` or an `i64` now holds the
+//! newtype the Ethos names for it (`Used`, `Resets`, `Duration`, `Expires`,
+//! `Allowed`, `At`, `Left`, `Expected`, `PerDay`, `ProcessId`, `UserId`),
+//! which archives and reads as its content.
 
 use signal::{ByteViewable, Contracted, Restorable, Signal, Signalizable};
 use signal_energy_nexus::*;
@@ -106,9 +119,9 @@ fn instant(at: i64) -> Instant {
 fn window(name: Name) -> Window {
     Window {
         name,
-        used: Percent(37),
-        resets: instant(1_789_000_000),
-        duration: Minutes(10_080),
+        used: Used(Percent(37)),
+        resets: Resets(instant(1_789_000_000)),
+        duration: Duration(Minutes(10_080)),
     }
 }
 
@@ -116,17 +129,17 @@ fn reset(status: ResetStatus) -> Reset {
     Reset {
         reset_id: ResetId("reset-a1".to_string()),
         reset_status: status,
-        expires: instant(1_789_100_000),
+        expires: Expires(instant(1_789_100_000)),
     }
 }
 
 fn reading(provider: Provider) -> Reading {
     Reading {
         provider,
-        allowed: true,
+        allowed: Allowed(true),
         window_vector: vec![window(Name::Session), window(Name::Week), window(Name::FableWeek)],
         reset_vector: vec![reset(ResetStatus::Available), reset(ResetStatus::Redeemed)],
-        at: instant(1_788_999_000),
+        at: At(instant(1_788_999_000)),
     }
 }
 
@@ -143,17 +156,17 @@ fn pace(standing: Standing, target: Target) -> Pace {
         provider: Provider::Claude,
         name: Name::Week,
         target,
-        expected: Percent(50),
-        used: Percent(61),
+        expected: Expected(Percent(50)),
+        used: Used(Percent(61)),
         standing,
-        per_day: Percent(9),
+        per_day: PerDay(Percent(9)),
     }
 }
 
 fn caller() -> Caller {
     Caller {
-        process_id: 4242,
-        user_id: 1001,
+        process_id: ProcessId(4242),
+        user_id: UserId(1001),
     }
 }
 
@@ -184,7 +197,7 @@ fn produce(wire: &mut Wire) {
         Threshold,
         Threshold {
             level: Level::Fair,
-            left: Percent(40)
+            left: Left(Percent(40))
         }
     );
     for aspect in [Aspect::Psyche, Aspect::Mind, Aspect::Field] {
@@ -229,16 +242,16 @@ fn produce(wire: &mut Wire) {
     }
     case!(wire, "Pace", Pace, pace(Standing::Over, Target::Even));
     case!(wire, "Caller", Caller, caller());
-    case!(wire, "Query.Read", Query, Query::Read(Provider::Claude));
-    case!(wire, "Query.Subscribe", Query, Query::Subscribe);
-    case!(wire, "Query.Redeem", Query, Query::Redeem(Provider::Codex));
+    case!(wire, "Query.Read", Input, Input::Read(Provider::Claude));
+    case!(wire, "Query.Subscribe", Input, Input::Subscribe);
+    case!(wire, "Query.Redeem", Input, Input::Redeem(Provider::Codex));
     case!(
         wire,
         "Call",
         Call,
         Call {
             caller: caller(),
-            input: Query::Read(Provider::Codex)
+            input: Input::Read(Provider::Codex)
         }
     );
     case!(
@@ -263,36 +276,36 @@ fn produce(wire: &mut Wire) {
             reading: reading(Provider::Codex),
         }
     );
-    case!(wire, "Refused.ProviderDown", Refused, Refused::ProviderDown(Provider::Claude));
-    case!(wire, "Refused.NoReset", Refused, Refused::NoReset);
+    case!(wire, "Refused.ProviderDown", Refused_Data, Refused_Data::ProviderDown(Provider::Claude));
+    case!(wire, "Refused.NoReset", Refused_Data, Refused_Data::NoReset);
     case!(
         wire,
         "Refused.RuleRefused",
-        Refused,
-        Refused::RuleRefused("no reset is available".to_string())
+        Refused_Data,
+        Refused_Data::RuleRefused("no reset is available".to_string())
     );
     case!(
         wire,
         "Response.Read",
-        Response,
-        Response::Read(Read_Data {
+        Output,
+        Output::Read(Read_Data {
             reading: reading(Provider::Claude),
             pace_vector: vec![pace(Standing::Over, Target::Even)],
         })
     );
-    case!(wire, "Response.Subscribed", Response, Response::Subscribed);
+    case!(wire, "Response.Subscribed", Output, Output::Subscribed);
     case!(
         wire,
         "Response.Changed",
-        Response,
-        Response::Changed(Changed_Data {
+        Output,
+        Output::Changed(Changed_Data {
             provider: Provider::Claude,
             level: Level::Plenty,
             reading: reading(Provider::Claude),
         })
     );
-    case!(wire, "Response.Redeemed", Response, Response::Redeemed(reset(ResetStatus::Redeemed)));
-    case!(wire, "Response.Refused", Response, Response::Refused(Refused::NoReset));
+    case!(wire, "Response.Redeemed", Output, Output::Redeemed(reset(ResetStatus::Redeemed)));
+    case!(wire, "Response.Refused", Output, Output::Refused(Refused_Data::NoReset));
 }
 
 fn contract() -> Vec<(String, String)> {

@@ -3,6 +3,7 @@ name = "signal-energy-nexus"
 version = "0.5.0"
 edition = "2021"
 rust-version = "1.89"
+build = "build.rs"
 
 [features]
 default = []
@@ -15,5 +16,5 @@ rkyv = { version = "0.8", default-features = false, features = ["std", "bytechec
 signal = { git = "https://github.com/LiGoldragon/signal", rev = "6d4eb74", default-features = false }
 signal-flow = { git = "https://github.com/LiGoldragon/signal-flow", rev = "4871bb81c1119fe72dc76168a97e1e576411b831", default-features = false }
 
-[dev-dependencies]
-ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "5a5daca", default-features = false }
+[build-dependencies]
+ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "970459d" }
