@@ -1,5 +1,15 @@
 # Upgrades
 
+## 0.6.0 — pace in useful hours; the schedule's types
+
+The Energy Nexus counts pace in useful hours (vision energy-nexus-v1, "Pace: over or under, per day"): each hour of a window counts at the usefulness its owner gave it. `Pace` loses `per_day` and gains `hours_left: Hours` (the hours left in the window, to its target), `useful_left: Decimal` (those hours, each at its usefulness) and `per_useful_hour: Decimal` (percent left per useful hour left); `expected` is now counted in useful hours. Datom text: `{ Codex Week Even 25 35 Over 124 83.5 0.78 }`.
+
+New library types, for the schedule the meta contract configures: `Hours`, `Hour` (0 to 23, the owner's local time), `Weekday`, `Usefulness.Percent`, `Baseline.Percent`, `Span.{ Vector<Weekday> From.Hour To.Hour Usefulness }` and `Override.{ From.Instant To.Instant Usefulness }`.
+
+`Decimal` is the wire's own finite decimal: one little-endian `f64` in the archive, `try_from` the only way in (a non-finite float is refused, `-0.0` reads as `0.0`), `Eq` and `Hash`. Under the `datom` feature its text is datom-codec's decimal, point-mandatory (`32.0`, `0.78`); without it the contract still carries no text dependency, so the Nexus process takes it.
+
+The wire of `Pace`, and of `Read_Data` and `Response.Read` which carry it, changes. The authored `signal.ethos` says so on the `Read` line, so the contract digest moves and a 0.5.0 peer is refused at the greeting. `tests/fixtures/` is written again by this revision; every other line is the 0.4.0 line, byte for byte.
+
 ## 0.5.0 — signal 11.0.0 and signal-flow 61.0.0
 
 Branch-only preparation for the Flow 0.54.7 rollout; deployed with it, in the same Home generation, with meta-signal-energy-nexus 0.5.0 and energy-nexus 0.3.2.
