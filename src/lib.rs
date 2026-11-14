@@ -2,7 +2,9 @@
 //! ethos-zero from `ethos/library.ethos` (the Energy vocabulary) and
 //! `ethos/signal.ethos` (the ordinary Signal) into `src/generated/`, and
 //! `build.rs` refuses a committed file that differs from its generation.
+pub mod decimal;
 pub mod generated;
+pub use decimal::{Decimating, FiniteDecimal, NotFinite};
 pub use generated::library::*;
 pub use generated::signal::*;
 
@@ -118,5 +120,98 @@ mod tests {
             .actualize(&mut budget)
             .unwrap();
         assert_eq!(restored, value);
+    }
+
+    #[test]
+    fn a_decimal_is_finite_and_its_zero_has_no_sign() {
+        assert!(FiniteDecimal::try_from(f64::NAN).is_err());
+        assert!(FiniteDecimal::try_from(f64::INFINITY).is_err());
+        assert_eq!(
+            FiniteDecimal::try_from(-0.0).unwrap().float().to_bits(),
+            0.0f64.to_bits()
+        );
+    }
+
+    #[test]
+    fn an_archived_float_that_is_not_finite_is_refused() {
+        let value = FiniteDecimal::try_from(1.5).unwrap();
+        let mut bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&value).unwrap().to_vec();
+        assert_eq!(bytes.len(), 8, "one little-endian f64");
+        bytes.copy_from_slice(&f64::NAN.to_le_bytes());
+        let mut aligned = rkyv::util::AlignedVec::<16>::new();
+        aligned.extend_from_slice(&bytes);
+        assert!(rkyv::from_bytes::<FiniteDecimal, rkyv::rancor::Error>(&aligned).is_err());
+    }
+
+    #[cfg(feature = "datom")]
+    fn budget() -> datom_codec::Budget {
+        datom_codec::Budget {
+            remaining: 256,
+            reader: protos::ReaderBudget::try_from(256).unwrap(),
+            depth: 0,
+            maximum_depth: 32,
+        }
+    }
+
+    #[cfg(feature = "datom")]
+    #[test]
+    fn pace_reads_in_useful_hours_in_datom_text() {
+        use datom_codec::{Actualizing, Datomizable, Potential};
+        use protos::{Compactable, Protosizable};
+        let value = Pace {
+            provider: Provider::Codex,
+            name: Name::Week,
+            target: Target::Even,
+            expected: Expected(Percent(25)),
+            used: Used(Percent(35)),
+            standing: Standing::Over,
+            hours_left: HoursLeft(Hours(124)),
+            useful_left: UsefulLeft(FiniteDecimal::try_from(83.5).unwrap()),
+            per_useful_hour: PerUsefulHour(FiniteDecimal::try_from(0.78).unwrap()),
+        };
+        let text = value.datomize(Vec::new()).protosize().compact();
+        assert_eq!(text, "{ Codex Week Even 25 35 Over 124 83.5 0.78 }");
+        let restored: Pace = Potential::<Pace>::from(text.as_str())
+            .actualize(&mut budget())
+            .unwrap();
+        assert_eq!(restored, value);
+        let whole = FiniteDecimal::try_from(32.0).unwrap();
+        assert_eq!(whole.datomize(Vec::new()).protosize().compact(), "32.0");
+        let short = Target::SpendBy(SpendBy_Data {
+            instant: Instant(1_762_450_320),
+            percent: Percent(80),
+        });
+        assert_eq!(
+            short.datomize(Vec::new()).protosize().compact(),
+            "SpendBy.{ 1762450320 80 }"
+        );
+    }
+
+    #[cfg(feature = "datom")]
+    #[test]
+    fn a_span_an_override_and_a_zone_read_as_the_vision_writes_them() {
+        use datom_codec::{Actualizing, Potential};
+        let span: Span = Potential::<Span>::from("{ [ Saturday Sunday ] 9 13 50 }")
+            .actualize(&mut budget())
+            .unwrap();
+        assert_eq!(
+            span,
+            Span {
+                weekday_vector: vec![Weekday::Saturday, Weekday::Sunday],
+                from: generated::library::From(Hour(9)),
+                to: To(Hour(13)),
+                usefulness: Usefulness(Percent(50)),
+            }
+        );
+        let stretch: Override = Potential::<Override>::from("{ 1794859200 1794866400 0 }")
+            .actualize(&mut budget())
+            .unwrap();
+        assert_eq!(stretch.since, Since(Instant(1_794_859_200)));
+        assert_eq!(stretch.until, Until(Instant(1_794_866_400)));
+        assert_eq!(stretch.usefulness, Usefulness(Percent(0)));
+        let zone: TimeZone = Potential::<TimeZone>::from("«America/Mexico_City»")
+            .actualize(&mut budget())
+            .unwrap();
+        assert_eq!(zone, TimeZone("America/Mexico_City".into()));
     }
 }

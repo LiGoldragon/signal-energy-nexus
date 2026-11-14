@@ -3,7 +3,7 @@ Signal
 [ Read.Provider                                           ; the latest reading, read first when older than the last turn end on it
   Subscribe
   Redeem.Provider ]
-[ Read.{ Reading Vector<Pace> }                           ; ordinary Energy Nexus outputs, the n-th answering the n-th input
+[ Read.{ Reading Vector<Pace> }                           ; the reading, and the pace of each window in useful hours; the n-th output answers the n-th input
   Subscribed
   Redeemed.Reset
   Changed.{ Provider Level Reading }                      ; one pushed level change, answering no input

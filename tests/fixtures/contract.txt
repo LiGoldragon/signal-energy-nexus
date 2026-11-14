@@ -1,8 +1,8 @@
-ETHOS_BYTES 951
-ContractDigest -927593971481128314
-Handshake.binary 86d21292328620f3
-Receipt.Greeted.binary 0086d21292328620f300
-Receipt.GreetingRefused.binary 010086d21292328620f3
-Handshake.datom { -927593971481128314 }
-Receipt.Greeted.datom Greeted.-927593971481128314
-Receipt.GreetingRefused.datom GreetingRefused.ContractMismatch.-927593971481128314
+ETHOS_BYTES 983
+ContractDigest -8897529803879169300
+Handshake.binary ecc254d5c89f8584
+Receipt.Greeted.binary 00ecc254d5c89f858400
+Receipt.GreetingRefused.binary 0100ecc254d5c89f8584
+Handshake.datom { -8897529803879169300 }
+Receipt.Greeted.datom Greeted.-8897529803879169300
+Receipt.GreetingRefused.datom GreetingRefused.ContractMismatch.-8897529803879169300

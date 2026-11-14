@@ -23,12 +23,19 @@
 //! text, which carries names, is unchanged. `hand_and_generated.rs` holds
 //! the 0.5.0 digest and proves the tag swap is the one byte difference.
 //!
+//! 0.6.0 also counts pace in useful hours and lets a target be short of
+//! whole, so the lines of `Target.SpendBy`, `Pace`, `Read_Data` and
+//! `Response.Read` are 0.6.0's, and the schedule's types (`Hours`, `Hour`,
+//! `Weekday`, `Usefulness`, `Baseline`, `Span`, `Override`, `TimeZone`,
+//! `FiniteDecimal`) have lines of their own. Every other line is the 0.4.0
+//! line, byte for byte.
+//!
 //! The values are built from the types ethos-zero generates. The fixture
 //! lines keep the 0.4.0 names: `Query` and `Response` are the generated
 //! `Input` and `Output`, and a field that held a
 //! `Percent`, an `Instant`, a `Minutes`, a `bool` or an `i64` now holds the
 //! newtype the Ethos names for it (`Used`, `Resets`, `Duration`, `Expires`,
-//! `Allowed`, `At`, `Left`, `Expected`, `PerDay`, `ProcessId`, `UserId`),
+//! `Allowed`, `At`, `Left`, `Expected`, `ProcessId`, `UserId`),
 //! which archives and reads as its content.
 
 use signal::{ByteViewable, Contracted, Restorable, Signal, Signalizable};
@@ -164,8 +171,17 @@ fn pace(standing: Standing, target: Target) -> Pace {
         expected: Expected(Percent(50)),
         used: Used(Percent(61)),
         standing,
-        per_day: PerDay(Percent(9)),
+        hours_left: HoursLeft(Hours(124)),
+        useful_left: UsefulLeft(FiniteDecimal::try_from(83.5).unwrap()),
+        per_useful_hour: PerUsefulHour(FiniteDecimal::try_from(0.78).unwrap()),
     }
+}
+
+fn spend_by() -> Target {
+    Target::SpendBy(SpendBy_Data {
+        instant: instant(1_789_200_000),
+        percent: Percent(80),
+    })
 }
 
 fn caller() -> Caller {
@@ -241,11 +257,49 @@ fn produce(wire: &mut Wire) {
         }
     );
     case!(wire, "Target.Even", Target, Target::Even);
-    case!(wire, "Target.SpendBy", Target, Target::SpendBy(instant(1_789_200_000)));
+    case!(wire, "Target.SpendBy", Target, spend_by());
     for standing in [Standing::Over, Standing::Under, Standing::On] {
         case!(wire, format!("Standing.{standing:?}"), Standing, standing);
     }
     case!(wire, "Pace", Pace, pace(Standing::Over, Target::Even));
+    case!(wire, "Hours", Hours, Hours(124));
+    case!(wire, "Hour", Hour, Hour(22));
+    for weekday in [
+        Weekday::Monday,
+        Weekday::Tuesday,
+        Weekday::Wednesday,
+        Weekday::Thursday,
+        Weekday::Friday,
+        Weekday::Saturday,
+        Weekday::Sunday,
+    ] {
+        case!(wire, format!("Weekday.{weekday:?}"), Weekday, weekday);
+    }
+    case!(wire, "Usefulness", Usefulness, Usefulness(Percent(50)));
+    case!(wire, "Baseline", Baseline, Baseline(Percent(20)));
+    case!(
+        wire,
+        "Span",
+        Span,
+        Span {
+            weekday_vector: vec![Weekday::Saturday, Weekday::Sunday],
+            from: signal_energy_nexus::From(Hour(9)),
+            to: To(Hour(13)),
+            usefulness: Usefulness(Percent(50)),
+        }
+    );
+    case!(
+        wire,
+        "Override",
+        Override,
+        Override {
+            since: Since(instant(1_794_859_200)),
+            until: Until(instant(1_794_866_400)),
+            usefulness: Usefulness(Percent(0)),
+        }
+    );
+    case!(wire, "TimeZone", TimeZone, TimeZone("America/Mexico_City".to_string()));
+    case!(wire, "FiniteDecimal", FiniteDecimal, FiniteDecimal::try_from(0.78).unwrap());
     case!(wire, "Caller", Caller, caller());
     case!(wire, "Query.Read", Input, Input::Read(Provider::Claude));
     case!(wire, "Query.Subscribe", Input, Input::Subscribe);
@@ -266,7 +320,7 @@ fn produce(wire: &mut Wire) {
         Read_Data {
             reading: reading(Provider::Claude),
             pace_vector: vec![
-                pace(Standing::Under, Target::SpendBy(instant(1_789_200_000))),
+                pace(Standing::Under, spend_by()),
                 pace(Standing::On, Target::Even)
             ],
         }

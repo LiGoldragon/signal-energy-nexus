@@ -13,6 +13,11 @@
 //! and the generated variant of the same name: every byte is one but that tag,
 //! and the two datom texts, which carry names, are one.
 //!
+//! `Target` and `Pace` change shape in 0.6.0 by design (`SpendBy` carries
+//! a percent; pace is counted in useful hours), so neither is proved here:
+//! `tests/wire_fixtures.rs` holds their 0.6.0 bytes and text. A `Read_Data`
+//! and `Output::Read` are proved with no pace, which they archive as before.
+//!
 //! The contract digest is compared last: it is the hash of the authored
 //! Ethos text, and the text had to change, since ethos-zero 28 refuses the
 //! 0.5.0 text (`Duplicate.Input`: a Signal implies its Input).
@@ -299,18 +304,6 @@ fn address(aspect: signal_flow::Aspect, model: signal_flow::Model) -> hand::Addr
     }
 }
 
-fn pace(standing: hand::Standing, target: hand::Target) -> hand::Pace {
-    hand::Pace {
-        provider: hand::Provider::Claude,
-        name: hand::Name::Week,
-        target,
-        expected: hand::Percent(50),
-        used: hand::Percent(61),
-        standing,
-        per_day: hand::Percent(9),
-    }
-}
-
 fn caller() -> hand::Caller {
     hand::Caller {
         process_id: 4242,
@@ -419,24 +412,8 @@ fn every_hand_type_archives_as_its_generated_type() {
             );
         }
     }
-    let targets = [
-        hand::Target::Even,
-        hand::Target::SpendBy(hand::Instant(1_789_200_000)),
-    ];
-    for target in targets.clone() {
-        prove!(proof, format!("Target.{target:?}"), hand::Target, generated::Target, target);
-    }
     for standing in [hand::Standing::Over, hand::Standing::Under, hand::Standing::On] {
         prove!(proof, format!("Standing.{standing:?}"), hand::Standing, generated::Standing, standing.clone());
-        for target in targets.clone() {
-            prove!(
-                proof,
-                format!("Pace.{standing:?}.{target:?}"),
-                hand::Pace,
-                generated::Pace,
-                pace(standing.clone(), target)
-            );
-        }
     }
     prove!(proof, "Caller", hand::Caller, generated::Caller, caller());
     let inputs = [
@@ -459,10 +436,7 @@ fn every_hand_type_archives_as_its_generated_type() {
     }
     let read = hand::Read_Data {
         reading: reading(hand::Provider::Claude, true),
-        pace_vector: vec![
-            pace(hand::Standing::Under, targets[1].clone()),
-            pace(hand::Standing::On, targets[0].clone()),
-        ],
+        pace_vector: Vec::new(),
     };
     let changed = hand::Changed_Data {
         provider: hand::Provider::Codex,

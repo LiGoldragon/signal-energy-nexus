@@ -14,6 +14,12 @@ The greeting moves once for all of this. ethos-zero 28 refuses the 0.5.0 text (`
 
 Rust names: `Query` is `Input`, `Response` is `Output`; a field holds the newtype its Ethos names (`Window.used: Used`, `Reading.allowed: Allowed`, `Reading.at: At`, `Reset.expires: Expires`, `Threshold.left: Left`, `Pace.expected/used/per_day`, `Caller.process_id: ProcessId`, `Caller.user_id: UserId`), each archiving as its content. `ProviderTarget` and `WindowTarget` are now this crate's, from the library.
 
+**Pace in useful hours; the schedule's types; a target short of whole** (energy-nexus branch `schedule-pace` carried onto the generated contract, with Fable's rulings). New Library types: `Hours`, `Hour` (0 to 23, the owner's local time), `Weekday`, `Usefulness.Percent`, `Baseline.Percent`, `Span.{ Vector<Weekday> From.Hour To.Hour Usefulness }`, `Override.{ Since.Instant Until.Instant Usefulness }` and `TimeZone.String` (an IANA name). `Pace` loses `per_day` (and the `PerDay` type goes) and gains `hours_left: HoursLeft(Hours)`, `useful_left: UsefulLeft(FiniteDecimal)` and `per_useful_hour: PerUsefulHour(FiniteDecimal)`; `expected` is counted in useful hours. Datom text: `{ Codex Week Even 25 35 Over 124 83.5 0.78 }`. `Target.SpendBy` carries an instant and a percent, `SpendBy.{ 1762450320 80 }`: that much of the window spent by that instant (tentative).
+
+`FiniteDecimal` (`src/decimal.rs`) is hand-written and imported by the Library (`:crate:decimal:[ FiniteDecimal ]`): Ethos's intrinsic `Decimal` generates `datom_codec::Decimal`, which would put datom-codec and its text parser into the Energy daemon, whose dependency boundary refuses them. It archives as one little-endian `f64`, refuses a non-finite value on the way in and on reading an archive, and under `datom` its text is datom-codec's decimal (`32.0`, `0.78`).
+
+The `Read` line's comment says pace is in useful hours, so the digest moves again within the unreleased 0.6.0: `-8897529803879169300`. `tests/fixtures/` holds the lines of `Target.Even` (its archive grew to the size of `SpendBy`), `Target.SpendBy`, `Pace`, `Read_Data` and `Response.Read` as 0.6.0 writes them and a line for each new type; every other line is the 0.4.0 line. `tests/hand_and_generated.rs` no longer proves `Target` and `Pace` against 0.5.0, since they change by design.
+
 ## 0.5.0 — signal 11.0.0 and signal-flow 61.0.0
 
 Branch-only preparation for the Flow 0.54.7 rollout; deployed with it, in the same Home generation, with meta-signal-energy-nexus 0.5.0 and energy-nexus 0.3.2.

@@ -1,12 +1,20 @@
 Library
-[ signal_flow:[ Address ] ]                               ; imports the Flow Nexus reminder address
+[ signal_flow:[ Address ]                                 ; imports the Flow Nexus reminder address
+  :crate:decimal:[ FiniteDecimal ] ]                      ; and the wire's own finite decimal, src/decimal.rs
 [ Provider.[ Claude Codex ]                               ; the providers whose energy is observed
   Percent.Integer
   Instant.Integer
   Minutes.Integer
   Used.Percent
   Expected.Percent
-  PerDay.Percent
+  Hours.Integer
+  Hour.Integer                                             ; 0 to 23, in the owner's local time
+  Weekday.[ Monday Tuesday Wednesday Thursday Friday Saturday Sunday ]
+  Usefulness.Percent                                       ; what an hour counts for; 100 is an hour at full use
+  Baseline.Percent                                         ; the usefulness of an hour no span names
+  Span.{ Vector<Weekday> From.Hour To.Hour Usefulness }    ; on these days, between these hours, an hour counts this much
+  Override.{ Since.Instant Until.Instant Usefulness }      ; between these two instants, whatever the schedule says, an hour counts this much
+  TimeZone.String                                          ; the owner's time zone, an IANA name, America/Mexico_City
   Window.{ Name.[ Session Week FableWeek ] Used Resets.Instant Duration.Minutes } ; one provider rate-limit window
   ResetId.String
   ResetStatus.[ Available Redeeming Redeemed ]             ; the provider's reset-credit state
@@ -16,9 +24,13 @@ Library
   Threshold.{ Level Left.Percent }                         ; one level boundary
   Recipient.Address
   Reminder.{ Provider Level Recipient }                    ; a reminder destination and crossing
-  Target.[ Even SpendBy.Instant ]                          ; how usage is intended to be spent
+  Target.[ Even                                            ; how usage is intended to be spent: the window evenly,
+           SpendBy.{ Instant Percent } ]                   ; or this much of it by this instant
   ProviderTarget.{ Provider Target }                       ; one provider's pace target
   WindowTarget.{ Provider Name Target }                    ; one window's pace target override
-  Pace.{ Provider Name Target Expected Used Standing.[ Over Under On ] PerDay } ] ; actual usage against its target
+  Pace.{ Provider Name Target Expected Used Standing.[ Over Under On ] ; actual usage against its target, time in useful hours
+         HoursLeft.Hours                                   ; the hours left in the window, to its target
+         UsefulLeft.FiniteDecimal                          ; those hours, each counted at its usefulness
+         PerUsefulHour.FiniteDecimal } ]                   ; percent left per useful hour left
 []                                                         ; traits
 []                                                         ; associations
