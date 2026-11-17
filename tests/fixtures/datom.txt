@@ -57,12 +57,15 @@ Query.Read Read.Claude
 Query.Subscribe Subscribe
 Query.Redeem Redeem.Codex
 Call { { 4242 1001 } Read.Codex }
-Read_Data { { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week SpendBy.{ 48 80 } 50 61 Under 124 83.5 0.78 } { Claude Week Even 50 61 On 124 83.5 0.78 } ] }
+Read_Data { { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week SpendBy.{ 48 80 } 50 61 Under 124 83.5 0.78 } { Claude Week Even 50 61 On 124 83.5 0.78 } ] Held }
+ContractMismatch { 1794757015 4918182474762796509 -9080287517047382240 }
+TurnEndSubscription.Held Held
+TurnEndSubscription.Mismatched Mismatched.{ 1794757015 4918182474762796509 -9080287517047382240 }
 Changed_Data { Codex Out { Codex True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } }
 Refused.ProviderDown ProviderDown.Claude
 Refused.NoReset NoReset
 Refused.RuleRefused RuleRefused.«no reset is available»
-Response.Read Read.{ { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week Even 50 61 Over 124 83.5 0.78 } ] }
+Response.Read Read.{ { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } [ { Claude Week Even 50 61 Over 124 83.5 0.78 } ] Mismatched.{ 1794757015 4918182474762796509 -9080287517047382240 } }
 Response.Subscribed Subscribed
 Response.Changed Changed.{ Claude Plenty { Claude True [ { Session 37 1789000000 10080 } { Week 37 1789000000 10080 } { FableWeek 37 1789000000 10080 } ] [ { reset-a1 Available 1789100000 } { reset-a1 Redeemed 1789100000 } ] 1788999000 } }
 Response.Redeemed Redeemed.{ reset-a1 Redeemed 1789100000 }

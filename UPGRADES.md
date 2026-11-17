@@ -1,5 +1,11 @@
 # Upgrades
 
+## 0.8.0 — a read says whether Flow's turn ends reach the Nexus
+
+`Read.{ Reading Vector<Pace> TurnEndSubscription }`: a read carries, after its pace, whether the Nexus is reading on Flow's turn ends. `TurnEndSubscription.[ Held Mismatched.ContractMismatch ]`: `Held` is Flow's turn ends reaching the Nexus, so a reading older than the last turn end is read again; `Mismatched` is Flow refusing the subscription at its greeting, `ContractMismatch.{ Since OwnContract.ContractDigest FlowContract.ContractDigest }`, since that instant, with the digest Energy greets with and the digest Flow speaks. While it is `Mismatched` no reading is read on a turn end, and the reading answered is as old as its `At`: a reader shows it stale, with its age, rather than as current. `ContractDigest` is imported from `signal`. Datom text: `Mismatched.{ 1794757015 4918182474762796509 -9080287517047382240 }`.
+
+The digest moves with the `Read` line, `8351560973109316117` to `7365813284414732128`, so a 0.7.0 peer is refused at its greeting. `Output` archives larger, since its `Read` variant is larger: every `Response` line of `tests/fixtures/binary.txt` is 0.8.0's, as are the `Read_Data` line and the new `ContractMismatch` and `TurnEndSubscription` lines; the datom text of every other output is unchanged. Both binary peers, the daemon and its translator, ship in one energy-nexus package, which moves with this contract.
+
 ## 0.7.0 — a SpendBy target is hours before the window resets, and recurs
 
 `Target.SpendBy` carries `{ Hours Percent }` where 0.6.0 carried `{ Instant Percent }`: `Hours`, a whole number (the library's `Hours.Integer`), is how many hours before the window resets the target falls, `Percent` how much of the window is to be spent by then. A target stated against the reset recurs with every reset: the instant is the window's `Resets` minus `Hours`, each window. Datom text `SpendBy.{ 48 92 }` reads: 92 percent spent 48 hours before the window resets. The reading `Pace.Target` carries the target as set.

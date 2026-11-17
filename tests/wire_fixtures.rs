@@ -34,6 +34,12 @@
 //! an instant: the `Target.SpendBy` and `Read_Data` lines hold 48 hours, and
 //! `contract.txt` holds the identity the changed `Read` comment gives.
 //!
+//! 0.8.0 makes a read carry whether Flow's turn ends reach the Nexus,
+//! `TurnEndSubscription`: the `Read_Data` and `Response.Read` lines are
+//! 0.8.0's, `ContractMismatch` and both `TurnEndSubscription` variants have
+//! lines of their own, and `contract.txt` holds the identity the changed
+//! `Read` line gives.
+//!
 //! The values are built from the types ethos-zero generates. The fixture
 //! lines keep the 0.4.0 names: `Query` and `Response` are the generated
 //! `Input` and `Output`, and a field that held a
@@ -130,6 +136,16 @@ macro_rules! case {
 
 fn instant(at: i64) -> Instant {
     Instant(at)
+}
+
+/// Flow refusing the turn-end subscription, as the journal of 15 November
+/// 2026 recorded it: Energy greeting with signal-flow 63, Flow speaking 64.
+fn mismatch() -> ContractMismatch {
+    ContractMismatch {
+        since: Since(instant(1_794_757_015)),
+        own_contract: OwnContract(signal::ContractDigest(4_918_182_474_762_796_509)),
+        flow_contract: FlowContract(signal::ContractDigest(-9_080_287_517_047_382_240)),
+    }
 }
 
 fn window(name: Name) -> Window {
@@ -327,7 +343,16 @@ fn produce(wire: &mut Wire) {
                 pace(Standing::Under, spend_by()),
                 pace(Standing::On, Target::Even)
             ],
+            turn_end_subscription: TurnEndSubscription::Held,
         }
+    );
+    case!(wire, "ContractMismatch", ContractMismatch, mismatch());
+    case!(wire, "TurnEndSubscription.Held", TurnEndSubscription, TurnEndSubscription::Held);
+    case!(
+        wire,
+        "TurnEndSubscription.Mismatched",
+        TurnEndSubscription,
+        TurnEndSubscription::Mismatched(mismatch())
     );
     case!(
         wire,
@@ -354,6 +379,7 @@ fn produce(wire: &mut Wire) {
         Output::Read(Read_Data {
             reading: reading(Provider::Claude),
             pace_vector: vec![pace(Standing::Over, Target::Even)],
+            turn_end_subscription: TurnEndSubscription::Mismatched(mismatch()),
         })
     );
     case!(wire, "Response.Subscribed", Output, Output::Subscribed);

@@ -11,12 +11,14 @@
 //! `Output::Redeemed` archives with tag 2 and `Output::Changed` with tag 3,
 //! where 0.5.0 had 3 and 2. Every output is archived through the hand type
 //! and the generated variant of the same name: every byte is one but that tag,
-//! and the two datom texts, which carry names, are one.
+//! and the two datom texts, which carry names, are one. Since 0.8.0 the
+//! generated output archives 25 bytes wider, zero padding after the root.
 //!
 //! `Target` and `Pace` change shape in 0.6.0 by design (`SpendBy` carries
 //! a percent; pace is counted in useful hours), so neither is proved here:
-//! `tests/wire_fixtures.rs` holds their 0.6.0 bytes and text. A `Read_Data`
-//! and `Output::Read` are proved with no pace, which they archive as before.
+//! `tests/wire_fixtures.rs` holds their 0.6.0 bytes and text. `Read_Data`
+//! and `Output::Read` change shape in 0.8.0 by design (a read carries whether
+//! Flow's turn ends reach the Nexus), so neither is proved here either.
 //!
 //! The contract digest is compared last: it is the hash of the authored
 //! Ethos text, and the text had to change, since ethos-zero 28 refuses the
@@ -166,7 +168,7 @@ macro_rules! same {
 /// across by its archive (each payload type is proven one above).
 fn by_name(output: &hand::Response) -> generated::Output {
     match output {
-        hand::Response::Read(data) => generated::Output::Read(same!(data, generated::Read_Data)),
+        hand::Response::Read(_) => unreachable!("Read changes shape in 0.8.0; tests/wire_fixtures.rs holds it"),
         hand::Response::Subscribed => generated::Output::Subscribed,
         hand::Response::Changed(data) => {
             generated::Output::Changed(same!(data, generated::Changed_Data))
@@ -190,9 +192,15 @@ fn moved_tag(output: &hand::Response) -> Option<(u8, u8)> {
     }
 }
 
+/// How much wider 0.8.0's `Output` archives than 0.5.0's: its `Read`
+/// carries a `TurnEndSubscription`, and an output is as wide as its widest
+/// variant.
+const OUTPUT_WIDENING: usize = 25;
+
 impl Proof {
     /// One output, archived through the hand type and through the generated
-    /// variant of its name: the two archives are one but the moved tag, the
+    /// variant of its name: the two archives are one but the moved tag and
+    /// the padding of the wider 0.8.0 output, the
     /// generated archive reads back as the generated value, and the datom
     /// texts are one.
     fn prove_reordered(&mut self, hand: hand::Response) {
@@ -209,7 +217,12 @@ impl Proof {
             .map(|(at, (hand_byte, generated_byte))| (at, *hand_byte, *generated_byte))
             .collect();
         let expected = moved_tag(&hand);
-        let as_expected = hand_bytes.len() == generated_bytes.len()
+        // 0.8.0's `Read` is wider, so every output archives that much
+        // wider: the hand archive is the generated one's beginning, and the
+        // rest is the root's zero padding.
+        let padding = generated_bytes.get(hand_bytes.len()..).unwrap_or_default();
+        let as_expected = padding.len() == OUTPUT_WIDENING
+            && padding.iter().all(|byte| *byte == 0)
             && match expected {
                 None => differing.is_empty(),
                 Some((was, is)) => {
@@ -434,16 +447,11 @@ fn every_hand_type_archives_as_its_generated_type() {
             }
         );
     }
-    let read = hand::Read_Data {
-        reading: reading(hand::Provider::Claude, true),
-        pace_vector: Vec::new(),
-    };
     let changed = hand::Changed_Data {
         provider: hand::Provider::Codex,
         level: hand::Level::Out,
         reading: reading(hand::Provider::Codex, false),
     };
-    prove!(proof, "Read_Data", hand::Read_Data, generated::Read_Data, read.clone());
     prove!(proof, "Changed_Data", hand::Changed_Data, generated::Changed_Data, changed.clone());
     let refusals = [
         hand::Refused::ProviderDown(hand::Provider::Claude),
@@ -454,7 +462,6 @@ fn every_hand_type_archives_as_its_generated_type() {
         prove!(proof, format!("Refused.{refused:?}"), hand::Refused, generated::Refused, refused);
     }
     let mut outputs = vec![
-        hand::Response::Read(read),
         hand::Response::Subscribed,
         hand::Response::Changed(changed),
         hand::Response::Redeemed(reset(hand::ResetStatus::Redeemed)),

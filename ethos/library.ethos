@@ -1,5 +1,6 @@
 Library
 [ signal_flow:[ Address ]                                 ; imports the Flow Nexus reminder address
+  signal:[ ContractDigest ]                                ; and a contract's identity on the wire, the digest of its authored Signal
   :crate:decimal:[ FiniteDecimal ] ]                      ; and the wire's own finite decimal, src/decimal.rs
 [ Provider.[ Claude Codex ]                               ; the providers whose energy is observed
   Percent.Integer
@@ -30,6 +31,11 @@ Library
   Pace.{ Provider Name Target Expected Used Standing.[ Over Under On Spent ] ; actual usage against its target, time in useful hours; Spent is a Session spent out, a fault in the pace of work
          HoursLeft.Hours                                   ; the hours left in the window, to its target
          UsefulLeft.FiniteDecimal                          ; those hours, each counted at its usefulness
-         PerUsefulHour.FiniteDecimal } ]                   ; percent left per useful hour left
+         PerUsefulHour.FiniteDecimal }                     ; percent left per useful hour left
+  ContractMismatch.{ Since                                 ; Flow has refused the turn-end subscription since this instant:
+                     OwnContract.ContractDigest            ;   the contract Energy greets with
+                     FlowContract.ContractDigest }         ;   is not the one Flow speaks
+  TurnEndSubscription.[ Held                               ; Flow's turn ends reach the Nexus: a reading older than the last turn end is read again
+                        Mismatched.ContractMismatch ] ]    ; none reach it: no reading is read on a turn end, and each is as old as its At
 []                                                         ; traits
 []                                                         ; associations

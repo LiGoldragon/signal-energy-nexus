@@ -48,6 +48,7 @@ pub enum Input {
 pub struct Read_Data {
     pub reading: crate::Reading,
     pub pace_vector: std::vec::Vec<crate::Pace>,
+    pub turn_end_subscription: crate::TurnEndSubscription,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
