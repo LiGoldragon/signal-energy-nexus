@@ -40,6 +40,10 @@
 //! lines of their own, and `contract.txt` holds the identity the changed
 //! `Read` line gives.
 //!
+//! 0.9.0 appends API providers, the `Credit` window and the ordinary `Balance`
+//! input, output and refusals. Existing variant tags and payloads stay put;
+//! the new names and current contract identity are added to the same fixtures.
+//!
 //! The values are built from the types ethos-zero generates. The fixture
 //! lines keep the 0.4.0 names: `Query` and `Response` are the generated
 //! `Input` and `Output`, and a field that held a
@@ -516,7 +520,7 @@ fn differences(name: &str, produced: &[(String, String)]) -> Vec<String> {
 }
 
 #[test]
-fn the_wire_is_the_0_4_0_wire() {
+fn wire_matches_the_versioned_fixtures() {
     let writing = std::env::var("WIRE_FIXTURES_WRITE").ok();
     let mut wire = Wire {
         held_binary: BTreeMap::new(),
