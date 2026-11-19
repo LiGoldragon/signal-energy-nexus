@@ -5,10 +5,15 @@ Library
   [ Provider.[ Claude Codex ClaudeApi OpenAiApi ]           ; subscription and API providers
   Cents.Integer                                              ; one whole cent
   Renewal.[ Once Monthly ]                                  ; whether the configured credit renews at its expiry
-  Credit.{ Provider Granted.Cents Starts.Instant Expires.Instant Renewal LeadTime.Option<Minutes> }
+  CreditGranted.Integer                                     ; a grant amount, as a whole number of cents
+  CreditSpent.Integer                                       ; an observed spend amount, as a whole number of cents
+  CreditLeft.Integer                                        ; the amount left, as a whole number of cents
+  CreditPerDay.Integer                                      ; the daily budget, as a whole number of cents
+  LeadTime.Option<Minutes>                                  ; how early the configured credit becomes Low
+  Credit.{ Provider CreditGranted Starts.Instant Expires Renewal LeadTime }
                                                             ; one grant and the configured time before expiry at which it is Low
   Spent.{ Provider Cents At.Instant }                       ; what was spent in the configured Credit period, observed at At
-  Balance.{ Provider Granted.Cents Spent.Cents Left.Cents Expires.Instant PerDay.Cents }
+  Balance.{ Provider CreditGranted CreditSpent CreditLeft Expires CreditPerDay }
                                                             ; one configured grant, what was observed spent, what remains, when it expires and the budget each day
   Percent.Integer
   Instant.Integer
