@@ -1,15 +1,22 @@
 Signal
-[ crate:[ Provider Reading Level Reset Pace TurnEndSubscription ] ] ; imports the Energy Nexus vocabulary, ethos/library.ethos
+[ crate:[ Provider Reading Level Reset Pace TurnEndSubscription Balance ] ] ; imports the Energy Nexus vocabulary, ethos/library.ethos
 [ Read.Provider                                           ; the latest reading, read first when older than the last turn end on it
   Subscribe
-  Redeem.Provider ]
+  Redeem.Provider
+  Balance.Provider ]                                       ; the configured credit, what was observed spent, and what remains
 [ Read.{ Reading Vector<Pace> TurnEndSubscription }      ; the reading, the pace of each window in useful hours, a SpendBy target counted in hours before the window resets, and whether Flow's turn ends reach the Nexus, so a stale reading says so; the n-th output answers the n-th input
   Subscribed
   Redeemed.Reset
+  Balance.Balance                                         ; one configured grant's observed balance
+  BalanceRefused.[ NoCredit.Provider                      ; no grant is configured
+                   SpentUnavailable.Provider              ; no spend observation is known for the grant's period
+                   ProviderDown.Provider ]                ; its spend observation could not be obtained
   Changed.{ Provider Level Reading }                      ; one pushed level change, answering no input
   Refused ]                                               ; any input's refusal
 [ Refused.[ ProviderDown.Provider                         ; typed ordinary refusals
             NoReset
+            NoCredit.Provider
+            SpentUnavailable.Provider
             RuleRefused.String ]
   Caller.{ ProcessId.Integer UserId.Integer }             ; local envelope types
   Call.{ Caller Input } ]                                 ; carries the peer caller and the ordinary input

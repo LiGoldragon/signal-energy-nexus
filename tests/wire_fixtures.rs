@@ -213,13 +213,38 @@ fn caller() -> Caller {
 
 fn produce(wire: &mut Wire) {
     use signal_flow::{Aspect, Model};
-    for provider in [Provider::Claude, Provider::Codex] {
+    for provider in [Provider::Claude, Provider::Codex, Provider::ClaudeApi, Provider::OpenAiApi] {
         case!(wire, format!("Provider.{provider:?}"), Provider, provider);
     }
+    case!(wire, "Cents", Cents, Cents(20_000));
+    for renewal in [Renewal::Once, Renewal::Monthly] {
+        case!(wire, format!("Renewal.{renewal:?}"), Renewal, renewal);
+    }
+    case!(wire, "Credit", Credit, Credit {
+        provider: Provider::ClaudeApi,
+        granted: Cents(20_000),
+        starts: Starts(instant(1_795_046_400)),
+        expires: Expires(instant(1_797_638_400)),
+        renewal: Renewal::Monthly,
+        lead_time_option: Some(Minutes(10_080)),
+    });
+    case!(wire, "Spent", Spent, Spent {
+        provider: Provider::ClaudeApi,
+        cents: Cents(13),
+        at: At(instant(1_795_047_000)),
+    });
+    case!(wire, "Balance", Balance, Balance {
+        provider: Provider::ClaudeApi,
+        granted: Cents(20_000),
+        spent: Cents(13),
+        left: Cents(19_987),
+        expires: Expires(instant(1_797_638_400)),
+        per_day: Cents(689),
+    });
     case!(wire, "Percent", Percent, Percent(63));
     case!(wire, "Instant", Instant, instant(1_789_000_000));
     case!(wire, "Minutes", Minutes, Minutes(720));
-    for name in [Name::Session, Name::Week, Name::FableWeek] {
+    for name in [Name::Session, Name::Week, Name::FableWeek, Name::Credit] {
         case!(wire, format!("Name.{name:?}"), Name, name);
     }
     case!(wire, "Window", Window, window(Name::Week));
@@ -324,6 +349,7 @@ fn produce(wire: &mut Wire) {
     case!(wire, "Query.Read", Input, Input::Read(Provider::Claude));
     case!(wire, "Query.Subscribe", Input, Input::Subscribe);
     case!(wire, "Query.Redeem", Input, Input::Redeem(Provider::Codex));
+    case!(wire, "Query.Balance", Input, Input::Balance(Provider::ClaudeApi));
     case!(
         wire,
         "Call",
@@ -331,6 +357,15 @@ fn produce(wire: &mut Wire) {
         Call {
             caller: caller(),
             input: Input::Read(Provider::Codex)
+        }
+    );
+    case!(
+        wire,
+        "Call.Balance",
+        Call,
+        Call {
+            caller: caller(),
+            input: Input::Balance(Provider::ClaudeApi)
         }
     );
     case!(
@@ -366,12 +401,32 @@ fn produce(wire: &mut Wire) {
     );
     case!(wire, "Refused.ProviderDown", Refused, Refused::ProviderDown(Provider::Claude));
     case!(wire, "Refused.NoReset", Refused, Refused::NoReset);
+    case!(wire, "Refused.NoCredit", Refused, Refused::NoCredit(Provider::ClaudeApi));
+    case!(wire, "Refused.SpentUnavailable", Refused, Refused::SpentUnavailable(Provider::ClaudeApi));
     case!(
         wire,
         "Refused.RuleRefused",
         Refused,
         Refused::RuleRefused("no reset is available".to_string())
     );
+    for (name, refusal) in [
+        ("NoCredit", BalanceRefused::NoCredit(Provider::ClaudeApi)),
+        ("SpentUnavailable", BalanceRefused::SpentUnavailable(Provider::ClaudeApi)),
+        ("ProviderDown", BalanceRefused::ProviderDown(Provider::ClaudeApi)),
+    ] {
+        case!(wire, format!("BalanceRefused.{name}"), BalanceRefused, refusal);
+    }
+    case!(wire, "Response.Balance", Output, Output::Balance(Balance {
+        provider: Provider::ClaudeApi,
+        granted: Cents(20_000),
+        spent: Cents(13),
+        left: Cents(19_987),
+        expires: Expires(instant(1_797_638_400)),
+        per_day: Cents(689),
+    }));
+    case!(wire, "Response.BalanceRefused", Output, Output::BalanceRefused(
+        BalanceRefused::SpentUnavailable(Provider::ClaudeApi)
+    ));
     case!(
         wire,
         "Response.Read",

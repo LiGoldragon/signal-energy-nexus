@@ -2,7 +2,14 @@ Library
 [ signal_flow:[ Address ]                                 ; imports the Flow Nexus reminder address
   signal:[ ContractDigest ]                                ; and a contract's identity on the wire, the digest of its authored Signal
   :crate:decimal:[ FiniteDecimal ] ]                      ; and the wire's own finite decimal, src/decimal.rs
-[ Provider.[ Claude Codex ]                               ; the providers whose energy is observed
+  [ Provider.[ Claude Codex ClaudeApi OpenAiApi ]           ; subscription and API providers
+  Cents.Integer                                              ; one whole cent
+  Renewal.[ Once Monthly ]                                  ; whether the configured credit renews at its expiry
+  Credit.{ Provider Granted.Cents Starts.Instant Expires.Instant Renewal LeadTime.Option<Minutes> }
+                                                            ; one grant and the configured time before expiry at which it is Low
+  Spent.{ Provider Cents At.Instant }                       ; what was spent in the configured Credit period, observed at At
+  Balance.{ Provider Granted.Cents Spent.Cents Left.Cents Expires.Instant PerDay.Cents }
+                                                            ; one configured grant, what was observed spent, what remains, when it expires and the budget each day
   Percent.Integer
   Instant.Integer
   Minutes.Integer
@@ -16,7 +23,7 @@ Library
   Span.{ Vector<Weekday> From.Hour To.Hour Usefulness }    ; on these days, between these hours, an hour counts this much
   Override.{ Since.Instant Until.Instant Usefulness }      ; between these two instants, whatever the schedule says, an hour counts this much
   TimeZone.String                                          ; the owner's time zone, an IANA name, America/Mexico_City
-  Window.{ Name.[ Session Week FableWeek ] Used Resets.Instant Duration.Minutes } ; one provider rate-limit window
+  Window.{ Name.[ Session Week FableWeek Credit ] Used Resets.Instant Duration.Minutes } ; one provider window, or its configured credit period
   ResetId.String
   ResetStatus.[ Available Redeeming Redeemed ]             ; the provider's reset-credit state
   Reset.{ ResetId ResetStatus Expires.Instant }            ; one reset credit

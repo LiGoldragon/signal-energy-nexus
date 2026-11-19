@@ -10,7 +10,17 @@
 pub enum Refused {
     ProviderDown(crate::Provider),
     NoReset,
+    NoCredit(crate::Provider),
+    SpentUnavailable(crate::Provider),
     RuleRefused(String),
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub enum BalanceRefused {
+    NoCredit(crate::Provider),
+    SpentUnavailable(crate::Provider),
+    ProviderDown(crate::Provider),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -41,6 +51,7 @@ pub enum Input {
     Read(crate::Provider),
     Subscribe,
     Redeem(crate::Provider),
+    Balance(crate::Provider),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -65,6 +76,8 @@ pub enum Output {
     Read(Read_Data),
     Subscribed,
     Redeemed(crate::Reset),
+    Balance(crate::Balance),
+    BalanceRefused(BalanceRefused),
     Changed(Changed_Data),
     Refused(Refused),
 }
@@ -77,6 +90,10 @@ pub trait Answering {
         &self,
         provider: &crate::Provider,
     ) -> std::result::Result<crate::Reset, Output>;
+    fn balance(
+        &self,
+        provider: &crate::Provider,
+    ) -> std::result::Result<crate::Balance, Output>;
 }
 #[rustfmt::skip]
 pub trait Answerable {
@@ -94,6 +111,9 @@ impl Answerable for Input {
             }
             Input::Redeem(carried) => {
                 nexus.redeem(carried).map_or_else(|refusal| refusal, Output::Redeemed)
+            }
+            Input::Balance(carried) => {
+                nexus.balance(carried).map_or_else(|refusal| refusal, Output::Balance)
             }
         }
     }

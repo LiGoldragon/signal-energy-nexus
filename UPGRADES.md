@@ -1,5 +1,13 @@
 # Upgrades
 
+## 0.9.0 — configured API credits, spend observations and Balance
+
+`Provider` appends `ClaudeApi` and `OpenAiApi`; the existing `Claude` and `Codex` values remain the harness subscriptions. `Name.Credit` is the credit period in a `Reading`. `Credit` records the API provider, granted cents, exact period start and expiry, renewal (`Once` or `Monthly`), and the optional per-grant expiry lead in minutes. An omitted lead is normalized by Energy to seven days. `Spent` records an owner-supplied cents observation and its instant. `Balance` answers with the six declared values: provider, granted, spent, left, expiry and cents per day. The observation instant and coverage period stay in the saved configuration; they are not added to Balance.
+
+The ordinary Signal gains `Balance.Provider`, `Balance.Balance` and `BalanceRefused`. A grant with no spend observation answers `SpentUnavailable`, never a guessed zero. API-provider `Read` derives the Credit window from configured Credit and Spent. Low is crossed when money remains and expiry is within the grant's own lead, regardless of the remaining percent; the configured percent rule applies outside the lead. A monthly expiry advances one local calendar month in the owner's configured zone, clamping at month end and establishing known zero at the new period boundary. Start, Low-lead and expiry are event alarms; a changed grant or observation re-arms the provider without polling.
+
+The added `Balance` and refusal outputs change the ordinary contract identity and output tags; a peer must use the matching Energy package. `tests/wire_fixtures.rs` carries the 0.9.0 values; all older fixture lines remain historical evidence. The generated files and fixture bytes must match ethos-zero under the bounded release gate.
+
 ## 0.8.0 — a read says whether Flow's turn ends reach the Nexus
 
 `Read.{ Reading Vector<Pace> TurnEndSubscription }`: a read carries, after its pace, whether the Nexus is reading on Flow's turn ends. `TurnEndSubscription.[ Held Mismatched.ContractMismatch ]`: `Held` is Flow's turn ends reaching the Nexus, so a reading older than the last turn end is read again; `Mismatched` is Flow refusing the subscription at its greeting, `ContractMismatch.{ Since OwnContract.ContractDigest FlowContract.ContractDigest }`, since that instant, with the digest Energy greets with and the digest Flow speaks. While it is `Mismatched` no reading is read on a turn end, and the reading answered is as old as its `At`: a reader shows it stale, with its age, rather than as current. `ContractDigest` is imported from `signal`. Datom text: `Mismatched.{ 1794757015 4918182474762796509 -9080287517047382240 }`.

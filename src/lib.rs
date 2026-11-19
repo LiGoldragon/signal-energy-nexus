@@ -56,6 +56,16 @@ mod tests {
                 expires: Expires(Instant(0)),
             })
         }
+        fn balance(&self, provider: &Provider) -> Result<Balance, Output> {
+            Ok(Balance {
+                provider: provider.clone(),
+                granted: Cents(20_000),
+                spent: Cents(13),
+                left: Cents(19_987),
+                expires: Expires(Instant(1_797_638_400)),
+                per_day: Cents(689),
+            })
+        }
     }
 
     /// The third output answers the third input: a redeem is answered
@@ -74,6 +84,21 @@ mod tests {
         assert_eq!(
             Input::Read(Provider::Claude).answer(&Answers),
             Output::Refused(Refused::NoReset)
+        );
+    }
+
+    #[test]
+    fn balance_is_answered_by_its_own_output() {
+        assert_eq!(
+            Input::Balance(Provider::ClaudeApi).answer(&Answers),
+            Output::Balance(Balance {
+                provider: Provider::ClaudeApi,
+                granted: Cents(20_000),
+                spent: Cents(13),
+                left: Cents(19_987),
+                expires: Expires(Instant(1_797_638_400)),
+                per_day: Cents(689),
+            })
         );
     }
 
