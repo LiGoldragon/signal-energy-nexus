@@ -9,8 +9,8 @@ Library
   CreditSpent.Integer                                       ; an observed spend amount, as a whole number of cents
   CreditLeft.Integer                                        ; the amount left, as a whole number of cents
   CreditPerDay.Integer                                      ; the daily budget, as a whole number of cents
-  LeadTime.Option<Minutes>                                  ; how early the configured credit becomes Low
-  Credit.{ Provider CreditGranted Starts.Instant Expires Renewal LeadTime }
+  LeadTime.Integer                                          ; how early the configured credit becomes Low, in minutes
+  Credit.{ Provider CreditGranted Starts.Instant Expires Renewal Option<LeadTime> }
                                                             ; one grant and the configured time before expiry at which it is Low
   Spent.{ Provider Cents At.Instant }                       ; what was spent in the configured Credit period, observed at At
   Balance.{ Provider CreditGranted CreditSpent CreditLeft Expires CreditPerDay }
