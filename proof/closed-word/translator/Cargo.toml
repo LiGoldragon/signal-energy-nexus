@@ -1,0 +1,13 @@
+[package]
+name = "closed-word-translator-proof"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.89"
+publish = false
+
+[dependencies]
+closed-word-ordinary-proof = { path = "../core" }
+signal-energy-nexus = { path = "../../..", default-features = false, features = ["datom"] }
+worded = { path = "../../../../worded-2b7f1e" }
+datom-codec = { git = "https://github.com/LiGoldragon/datom-codec", rev = "09a0526" }
+protos = { git = "https://github.com/LiGoldragon/protos", rev = "c93b598" }

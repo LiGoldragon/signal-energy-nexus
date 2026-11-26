@@ -51,6 +51,7 @@
 use signal::{ByteViewable, Contracted, Restorable, Signal, Signalizable};
 use signal_energy_nexus::*;
 use std::collections::BTreeMap;
+use worded::Worded;
 
 fn topic(text: &str) -> signal_flow::Topic {
     signal_flow::Topic(text.to_string())
@@ -159,7 +160,7 @@ fn window(name: Name) -> Window {
 
 fn reset(status: ResetStatus) -> Reset {
     Reset {
-        reset_id: ResetId("reset-a1".to_string()),
+        reset_id: ResetId::word("reset-a1".to_string()),
         reset_status: status,
         expires: Expires(instant(1_789_100_000)),
     }
@@ -223,7 +224,7 @@ fn produce(wire: &mut Wire) {
         case!(wire, format!("Name.{name:?}"), Name, name);
     }
     case!(wire, "Window", Window, window(Name::Week));
-    case!(wire, "ResetId", ResetId, ResetId("reset-a1".to_string()));
+    case!(wire, "ResetId", ResetId, ResetId::word("reset-a1".to_string()));
     for status in [ResetStatus::Available, ResetStatus::Redeeming, ResetStatus::Redeemed] {
         case!(wire, format!("ResetStatus.{status:?}"), ResetStatus, status);
     }
@@ -318,7 +319,7 @@ fn produce(wire: &mut Wire) {
             usefulness: Usefulness(Percent(0)),
         }
     );
-    case!(wire, "TimeZone", TimeZone, TimeZone("America/Mexico_City".to_string()));
+    case!(wire, "TimeZone", TimeZone, TimeZone::word("America/Mexico_City".to_string()));
     case!(wire, "FiniteDecimal", FiniteDecimal, FiniteDecimal::try_from(0.78).unwrap());
     case!(wire, "Caller", Caller, caller());
     case!(wire, "Query.Read", Input, Input::Read(Provider::Claude));

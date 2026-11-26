@@ -2,8 +2,11 @@
     dead_code,
     non_camel_case_types,
     non_snake_case,
+    unused_extern_crates,
     clippy::type_complexity
 )]
+#[rustfmt::skip]
+extern crate alloc;
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -71,7 +74,7 @@ pub struct To(pub Hour);
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct Span {
-    pub weekday_vector: std::vec::Vec<Weekday>,
+    pub weekday_vector: alloc::vec::Vec<Weekday>,
     pub from: From,
     pub to: To,
     pub usefulness: Usefulness,
@@ -93,9 +96,24 @@ pub struct Override {
     pub usefulness: Usefulness,
 }
 #[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub struct TimeZone(pub String);
+pub struct TimeZone(alloc::string::String);
+#[rustfmt::skip]
+impl ::worded::Worded for TimeZone {
+    fn words(&self) -> alloc::string::String {
+        self.0.clone()
+    }
+    fn word(words: alloc::string::String) -> Self {
+        Self(words)
+    }
+}
+#[rustfmt::skip]
+impl core::fmt::Debug for TimeZone {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter.write_str(concat!(stringify!(TimeZone), "(<redacted>)"))
+    }
+}
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -122,9 +140,24 @@ pub struct Window {
     pub duration: Duration,
 }
 #[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub struct ResetId(pub String);
+pub struct ResetId(alloc::string::String);
+#[rustfmt::skip]
+impl ::worded::Worded for ResetId {
+    fn words(&self) -> alloc::string::String {
+        self.0.clone()
+    }
+    fn word(words: alloc::string::String) -> Self {
+        Self(words)
+    }
+}
+#[rustfmt::skip]
+impl core::fmt::Debug for ResetId {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter.write_str(concat!(stringify!(ResetId), "(<redacted>)"))
+    }
+}
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -159,8 +192,8 @@ pub struct At(pub Instant);
 pub struct Reading {
     pub provider: Provider,
     pub allowed: Allowed,
-    pub window_vector: std::vec::Vec<Window>,
-    pub reset_vector: std::vec::Vec<Reset>,
+    pub window_vector: alloc::vec::Vec<Window>,
+    pub reset_vector: alloc::vec::Vec<Reset>,
     pub at: At,
 }
 #[rustfmt::skip]

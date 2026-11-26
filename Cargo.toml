@@ -4,6 +4,7 @@ version = "0.8.0"
 edition = "2021"
 rust-version = "1.89"
 build = "build.rs"
+publish = false
 
 [features]
 default = []
@@ -16,5 +17,8 @@ rkyv = { version = "0.8", default-features = false, features = ["std", "bytechec
 signal = { git = "https://github.com/LiGoldragon/signal", rev = "6d4eb74", default-features = false }
 signal-flow = { git = "https://github.com/LiGoldragon/signal-flow", rev = "4871bb81c1119fe72dc76168a97e1e576411b831", default-features = false }
 
+worded = { path = "../worded-2b7f1e" }
+
 [build-dependencies]
-ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "970459d" }
+ethos-zero = { path = "../ethos-zero-closed-word-2b7f1e" }
+ethos-zero-legacy = { package = "ethos-zero", git = "https://github.com/LiGoldragon/ethos-zero", rev = "970459d100ddee5f62a76c05642ecfabefba6329" }

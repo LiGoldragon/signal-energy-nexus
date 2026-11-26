@@ -24,6 +24,7 @@ impl signal::Contracted for Call {
 mod tests {
     use super::*;
     use signal::{ByteViewable, Restorable, Signal, Signalizable};
+    use worded::Worded;
     #[test]
     fn validated_binary_round_trip() {
         let value = Call {
@@ -51,7 +52,7 @@ mod tests {
         }
         fn redeem(&self, provider: &Provider) -> Result<Reset, Output> {
             Ok(Reset {
-                reset_id: ResetId(format!("{provider:?}")),
+                reset_id: ResetId::word(format!("{provider:?}")),
                 reset_status: ResetStatus::Redeemed,
                 expires: Expires(Instant(0)),
             })
@@ -65,7 +66,7 @@ mod tests {
         assert_eq!(
             Input::Redeem(Provider::Codex).answer(&Answers),
             Output::Redeemed(Reset {
-                reset_id: ResetId("Codex".into()),
+                reset_id: ResetId::word("Codex".into()),
                 reset_status: ResetStatus::Redeemed,
                 expires: Expires(Instant(0)),
             })
@@ -212,6 +213,6 @@ mod tests {
         let zone: TimeZone = Potential::<TimeZone>::from("«America/Mexico_City»")
             .actualize(&mut budget())
             .unwrap();
-        assert_eq!(zone, TimeZone("America/Mexico_City".into()));
+        assert_eq!(zone, TimeZone::word("America/Mexico_City".into()));
     }
 }
