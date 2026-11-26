@@ -13,14 +13,14 @@ Library
   Weekday.[ Monday Tuesday Wednesday Thursday Friday Saturday Sunday ]
   Usefulness.Percent                                       ; what an hour counts for; 100 is an hour at full use
   Baseline.Percent                                         ; the usefulness of an hour no span names
-  Span.{ Vector<Weekday> From.Hour To.Hour Usefulness }    ; on these days, between these hours, an hour counts this much
+  Span.{ ⟦ Weekday ⟧ From.Hour To.Hour Usefulness }    ; on these days, between these hours, an hour counts this much
   Override.{ Since.Instant Until.Instant Usefulness }      ; between these two instants, whatever the schedule says, an hour counts this much
   TimeZone.String                                          ; the owner's time zone, an IANA name, America/Mexico_City
   Window.{ Name.[ Session Week FableWeek ] Used Resets.Instant Duration.Minutes } ; one provider rate-limit window
   ResetId.String
   ResetStatus.[ Available Redeeming Redeemed ]             ; the provider's reset-credit state
   Reset.{ ResetId ResetStatus Expires.Instant }            ; one reset credit
-  Reading.{ Provider Allowed.Boolean Vector<Window> Vector<Reset> At.Instant } ; one live provider observation
+  Reading.{ Provider Allowed.Boolean ⟦ Window ⟧ ⟦ Reset ⟧ At.Instant } ; one live provider observation
   Level.[ Plenty Fair Low Out ]                            ; the derived availability level
   Threshold.{ Level Left.Percent }                         ; one level boundary
   Recipient.Address
