@@ -17,4 +17,4 @@ signal = { git = "https://github.com/LiGoldragon/signal", rev = "6d4eb74", defau
 signal-flow = { git = "https://github.com/LiGoldragon/signal-flow", rev = "4871bb81c1119fe72dc76168a97e1e576411b831", default-features = false }
 
 [build-dependencies]
-ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "970459d" }
+ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "9abd9fe56a2b1b84fb858ae4c8cb74435e063a04" }
