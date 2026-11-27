@@ -3,7 +3,7 @@ Signal
 [ Read.Provider                                           ; the latest reading, read first when older than the last turn end on it
   Subscribe
   Redeem.Provider ]
-[ Read.{ Reading Vector<Pace> TurnEndSubscription }      ; the reading, the pace of each window in useful hours, a SpendBy target counted in hours before the window resets, and whether Flow's turn ends reach the Nexus, so a stale reading says so; the n-th output answers the n-th input
+[ Read.{ Reading ⟦ Pace ⟧ TurnEndSubscription }      ; the reading, the pace of each window in useful hours, a SpendBy target counted in hours before the window resets, and whether Flow's turn ends reach the Nexus, so a stale reading says so; the n-th output answers the n-th input
   Subscribed
   Redeemed.Reset
   Changed.{ Provider Level Reading }                      ; one pushed level change, answering no input

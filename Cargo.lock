@@ -85,8 +85,8 @@ dependencies = [
 
 [[package]]
 name = "ethos-zero"
-version = "28.0.0"
-source = "git+https://github.com/LiGoldragon/ethos-zero?rev=970459d#970459d100ddee5f62a76c05642ecfabefba6329"
+version = "31.1.3"
+source = "git+https://github.com/LiGoldragon/ethos-zero?rev=446d5f15ae2f619c64f9d55f589f6a127062aeb1#446d5f15ae2f619c64f9d55f589f6a127062aeb1"
 dependencies = [
  "datom-codec",
  "prettyplease",
@@ -312,7 +312,7 @@ name = "signal-energy-nexus"
 version = "0.8.0"
 dependencies = [
  "datom-codec",
- "ethos-zero 28.0.0",
+ "ethos-zero 31.1.3",
  "protos",
  "rkyv",
  "signal",
