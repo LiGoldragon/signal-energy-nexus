@@ -1,6 +1,6 @@
 [package]
 name = "signal-energy-nexus"
-version = "0.8.0"
+version = "0.10.0"
 edition = "2021"
 rust-version = "1.89"
 build = "build.rs"
@@ -13,8 +13,8 @@ datom = ["dep:datom-codec", "dep:protos", "signal-flow/datom"]
 datom-codec = { git = "https://github.com/LiGoldragon/datom-codec", rev = "09a0526", optional = true }
 protos = { git = "https://github.com/LiGoldragon/protos", rev = "c93b598", optional = true }
 rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-signal = { git = "https://github.com/LiGoldragon/signal", rev = "6d4eb74", default-features = false }
-signal-flow = { git = "https://github.com/LiGoldragon/signal-flow", rev = "4871bb81c1119fe72dc76168a97e1e576411b831", default-features = false }
+signal = { git = "https://github.com/LiGoldragon/signal", rev = "4f5cbb9322ecae7a8821439179e778d495d7804a", default-features = false }
+signal-flow = { git = "https://github.com/LiGoldragon/signal-flow", rev = "6932471e69f06cf2f8f27b3d09e80ac67feb396f", default-features = false }
 
 [build-dependencies]
 ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "970459d" }
