@@ -2,15 +2,18 @@
     dead_code,
     non_camel_case_types,
     non_snake_case,
+    unused_extern_crates,
     clippy::type_complexity
 )]
+#[rustfmt::skip]
+extern crate alloc;
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum Refused {
     ProviderDown(crate::Provider),
     NoReset,
-    RuleRefused(String),
+    RuleRefused(alloc::string::String),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -47,7 +50,7 @@ pub enum Input {
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct Read_Data {
     pub reading: crate::Reading,
-    pub pace_vector: std::vec::Vec<crate::Pace>,
+    pub pace_vector: alloc::vec::Vec<crate::Pace>,
     pub turn_end_subscription: crate::TurnEndSubscription,
 }
 #[rustfmt::skip]
@@ -71,19 +74,24 @@ pub enum Output {
 #[rustfmt::skip]
 #[allow(clippy::result_large_err, clippy::ptr_arg, clippy::borrowed_box)]
 pub trait Answering {
-    fn read(&self, provider: &crate::Provider) -> std::result::Result<Read_Data, Output>;
-    fn subscribe(&self) -> std::result::Result<(), Output>;
+    fn read(
+        &self,
+        provider: &crate::Provider,
+    ) -> core::result::Result<Read_Data, Output>;
+    fn subscribe(&self) -> core::result::Result<(), Output>;
     fn redeem(
         &self,
         provider: &crate::Provider,
-    ) -> std::result::Result<crate::Reset, Output>;
+    ) -> core::result::Result<crate::Reset, Output>;
 }
 #[rustfmt::skip]
 pub trait Answerable {
-    fn answer<Nexus: Answering>(&self, nexus: &Nexus) -> Output;
+    type Answer;
+    fn answer<Nexus: Answering>(&self, nexus: &Nexus) -> Self::Answer;
 }
 #[rustfmt::skip]
 impl Answerable for Input {
+    type Answer = Output;
     fn answer<Nexus: Answering>(&self, nexus: &Nexus) -> Output {
         match self {
             Input::Read(carried) => {
