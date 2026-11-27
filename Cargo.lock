@@ -85,6 +85,20 @@ dependencies = [
 
 [[package]]
 name = "ethos-zero"
+version = "27.0.0"
+source = "git+https://github.com/LiGoldragon/ethos-zero?rev=8c95310#8c95310c4c372cfe115cdebc3e85021b98cf2974"
+dependencies = [
+ "datom-codec",
+ "prettyplease",
+ "proc-macro2",
+ "protos",
+ "quote",
+ "rkyv",
+ "syn 3.0.9",
+]
+
+[[package]]
+name = "ethos-zero"
 version = "28.0.0"
 source = "git+https://github.com/LiGoldragon/ethos-zero?rev=970459d#970459d100ddee5f62a76c05642ecfabefba6329"
 dependencies = [
@@ -297,11 +311,12 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "signal"
-version = "11.0.0"
-source = "git+https://github.com/LiGoldragon/signal?rev=6d4eb74#6d4eb74a238ea4a6149bd12c42a8c06aec01b154"
+version = "11.2.0"
+source = "git+https://github.com/LiGoldragon/signal?rev=4f5cbb9322ecae7a8821439179e778d495d7804a#4f5cbb9322ecae7a8821439179e778d495d7804a"
 dependencies = [
  "datom-codec",
  "ethos-zero 22.0.0",
+ "futures-core",
  "protos",
  "rkyv",
  "thiserror",
@@ -309,7 +324,7 @@ dependencies = [
 
 [[package]]
 name = "signal-energy-nexus"
-version = "0.8.0"
+version = "0.10.0"
 dependencies = [
  "datom-codec",
  "ethos-zero 28.0.0",
@@ -321,11 +336,11 @@ dependencies = [
 
 [[package]]
 name = "signal-flow"
-version = "61.0.0"
-source = "git+https://github.com/LiGoldragon/signal-flow?rev=4871bb81c1119fe72dc76168a97e1e576411b831#4871bb81c1119fe72dc76168a97e1e576411b831"
+version = "0.74.0"
+source = "git+https://github.com/LiGoldragon/signal-flow?rev=6932471e69f06cf2f8f27b3d09e80ac67feb396f#6932471e69f06cf2f8f27b3d09e80ac67feb396f"
 dependencies = [
  "datom-codec",
- "ethos-zero 22.0.0",
+ "ethos-zero 27.0.0",
  "flow-ethos",
  "protos",
  "rkyv",
